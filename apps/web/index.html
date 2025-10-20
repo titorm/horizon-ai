@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Horizon AI</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;700&display=swap"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ["Figtree", "sans-serif"],
+                        },
+                        colors: {
+                            primary: "#4285F4", // Google Blue
+                            "on-primary": "#FFFFFF",
+                            "primary-container": "#E8F0FE",
+                            "on-primary-container": "#174EA6",
+                            secondary: "#34A853", // Google Green
+                            "on-secondary": "#FFFFFF",
+                            tertiary: "#FFC107",
+                            error: "#EA4335", // Google Red
+                            "on-error": "#FFFFFF",
+                            surface: "#F8F9FA",
+                            "on-surface": "#1F1F1F",
+                            "on-surface-variant": "#5F6368",
+                            outline: "#DADCE0",
+                            "surface-container": "#FFFFFF", // For cards
+                        },
+                        borderRadius: {
+                            xs: "4px",
+                            s: "8px",
+                            m: "12px",
+                            l: "16px",
+                            xl: "18px", // New size for cards/inputs
+                            full: "9999px",
+                        },
+                        boxShadow: {
+                            sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                            md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            .fade-enter {
+                opacity: 0;
+            }
+            .fade-enter-active {
+                opacity: 1;
+                transition: opacity 300ms;
+            }
+            .fade-exit {
+                opacity: 1;
+            }
+            .fade-exit-active {
+                opacity: 0;
+                transition: opacity 300ms;
+            }
+        </style>
+        <script type="importmap">
+            {
+                "imports": {
+                    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+                    "react": "https://aistudiocdn.com/react@^19.2.0",
+                    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+                    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
+                    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.25.0"
+                }
+            }
+        </script>
+        <link rel="stylesheet" href="/index.css" />
+    </head>
+    <body class="bg-surface text-on-surface antialiased">
+        <div id="root"></div>
+        <script type="module" src="/src/index.tsx"></script>
+    </body>
+</html>
