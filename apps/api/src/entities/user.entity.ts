@@ -1,28 +1,17 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+/**
+ * Interface do Usuário
+ *
+ * No lugar de usar TypeORM, usamos uma interface TypeScript simples
+ * Os dados são obtidos diretamente do Supabase PostgreSQL
+ */
 
-@Entity('users')
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
-  @Column({ type: 'varchar', unique: true })
-  email!: string;
-
-  @Column({ type: 'varchar' })
-  password!: string;
-
-  @Column({ type: 'varchar', nullable: true })
+export interface User {
+  id: string;
+  email: string;
+  password: string;
   firstName?: string;
-
-  @Column({ type: 'varchar', nullable: true })
   lastName?: string;
-
-  @Column({ type: 'boolean', default: true })
-  isActive!: boolean;
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }

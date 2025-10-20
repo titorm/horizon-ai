@@ -1,32 +1,42 @@
 # Horizon AI - API
 
-Serviço de API backend para a plataforma Horizon AI, construído com NestJS.
+Serviço de API backend para a plataforma Horizon AI, construído com NestJS e Supabase PostgreSQL.
 
 ## Características
 
-- ✅ Autenticação com JWT
-- ✅ Sistema de Sign In / Sign Up
-- ✅ Gerenciamento de sessão com Cookies
-- ✅ Validação de dados
-- ✅ TypeORM para persistência de dados
-- ✅ SQLite para desenvolvimento
+- ✅ Autenticação com JWT (sem dependência de terceiros para auth)
+- ✅ Sistema de Sign In / Sign Up com Supabase
+- ✅ Gerenciamento de sessão com Cookies HTTP-only
+- ✅ Validação de dados com class-validator
+- ✅ Supabase PostgreSQL para persistência
 - ✅ CORS configurável
 - ✅ Testes com Jest
+- ✅ TypeScript strict mode
 
-## Instalação
+## Quick Start
+
+### 1. Configurar Supabase
+
+Veja [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) para instruções completas.
+
+### 2. Instalar e rodar
 
 ```bash
 # Install dependencies
 pnpm install
 
-# Copy environment file
-cp .env.example .env
+# Configurar .env com suas credenciais Supabase
+# SUPABASE_URL=https://xxxx.supabase.co
+# SUPABASE_KEY=seu_anon_public_key
+
+# Start development server with hot reload
+pnpm dev
 ```
 
 ## Desenvolvimento
 
 ```bash
-# Start development server with hot reload
+# Start dev server (port 3001)
 pnpm dev
 
 # Run tests
@@ -34,6 +44,12 @@ pnpm test
 
 # Run tests with coverage
 pnpm test:cov
+
+# Lint
+pnpm lint
+
+# Format
+pnpm format
 ```
 
 ## Build e Produção
