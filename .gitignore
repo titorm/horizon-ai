@@ -23,3 +23,4 @@ apps/api/backups
 *.njsproj
 *.sln
 *.sw?
+.env.local
