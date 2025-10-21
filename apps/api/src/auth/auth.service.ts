@@ -1,18 +1,18 @@
-import { Injectable, ConflictException, UnauthorizedException, Logger } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, Logger, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { User } from '@/entities/user.entity';
-import { SupabaseService } from '@/supabase/supabase.service';
+import { eq } from 'drizzle-orm';
 import { SignUpDto, SignInDto, AuthResponseDto } from './dto';
-import { v4 as uuidv4 } from 'uuid';
+import { db } from '@/database/db';
+import { users } from '@/database/schema';
+import type { User } from '@/database/schema';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    private supabaseService: SupabaseService,
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
@@ -21,9 +21,11 @@ export class AuthService {
     const { email, password, firstName, lastName } = signUpDto;
 
     // Check if user already exists
-    const { data: existingUsers } = await this.supabaseService.getUsersTable().select().eq('email', email).limit(1);
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
 
-    if (existingUsers && existingUsers.length > 0) {
+    if (existingUser) {
       throw new ConflictException('Email already in use');
     }
 
@@ -31,30 +33,18 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user
-    const userId = uuidv4();
-    const now = new Date().toISOString();
-
-    const { data: newUser, error } = await this.supabaseService
-      .getUsersTable()
-      .insert({
-        id: userId,
+    const newUsers = await db
+      .insert(users)
+      .values({
         email,
         password: hashedPassword,
         firstName: firstName || null,
         lastName: lastName || null,
         isActive: true,
-        createdAt: now,
-        updatedAt: now,
-      } as any)
-      .select()
-      .single();
+      })
+      .returning();
 
-    if (error) {
-      this.logger.error(`Failed to create user: ${error.message}`);
-      throw new ConflictException('Failed to create user');
-    }
-
-    const user = newUser as User;
+    const user = newUsers[0];
 
     // Generate token
     const accessToken = this.generateAccessToken(user);
@@ -62,8 +52,8 @@ export class AuthService {
     return {
       id: user.id,
       email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
       accessToken,
     };
   }
@@ -72,13 +62,13 @@ export class AuthService {
     const { email, password } = signInDto;
 
     // Find user
-    const { data: users, error } = await this.supabaseService.getUsersTable().select().eq('email', email).limit(1);
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
 
-    if (error || !users || users.length === 0) {
+    if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
-
-    const user = users[0] as User;
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -97,20 +87,20 @@ export class AuthService {
     return {
       id: user.id,
       email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
       accessToken,
     };
   }
 
   async validateUser(email: string, password: string): Promise<User> {
-    const { data: users, error } = await this.supabaseService.getUsersTable().select().eq('email', email).limit(1);
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
 
-    if (error || !users || users.length === 0) {
+    if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
-    const user = users[0] as User;
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
@@ -133,12 +123,14 @@ export class AuthService {
   }
 
   async getCurrentUser(userId: string): Promise<User> {
-    const { data: users, error } = await this.supabaseService.getUsersTable().select().eq('id', userId).limit(1);
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+    });
 
-    if (error || !users || users.length === 0) {
+    if (!user) {
       throw new UnauthorizedException('User not found');
     }
 
-    return users[0] as User;
+    return user;
   }
 }

@@ -78,8 +78,8 @@ export class AuthController {
     return {
       id: user.id,
       email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      firstName: user.firstName ?? undefined,
+      lastName: user.lastName ?? undefined,
       accessToken: '', // Don't send token in response
     };
   }
