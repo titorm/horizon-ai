@@ -1,55 +1,234 @@
 # Horizon AI - API
 
-Serviço de API backend para a plataforma Horizon AI, construído com NestJS e Supabase PostgreSQL.
+Serviço de API backend para a plataforma Horizon AI, construído com NestJS e Drizzle ORM.
 
 ## Características
 
 - ✅ Autenticação com JWT (sem dependência de terceiros para auth)
-- ✅ Sistema de Sign In / Sign Up com Supabase
 - ✅ Gerenciamento de sessão com Cookies HTTP-only
 - ✅ Validação de dados com class-validator
-- ✅ Supabase PostgreSQL para persistência
+- ✅ Drizzle ORM com PostgreSQL para persistência type-safe
+- ✅ Migrations automáticas com Drizzle Kit
 - ✅ CORS configurável
 - ✅ Testes com Jest
 - ✅ TypeScript strict mode
 
 ## Quick Start
 
-### 1. Configurar Supabase
+### 1. Configurar Banco de Dados
 
-Veja [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) para instruções completas.
+Você pode usar **PostgreSQL local** ou **Supabase** (PostgreSQL em nuvem).
 
-### 2. Instalar e rodar
+#### Opção A: PostgreSQL Local com Docker
 
 ```bash
-# Install dependencies
+# Iniciar PostgreSQL em container
+docker run --name horizon-ai-db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=horizon_ai \
+  -p 5432:5432 \
+  -d postgres:15
+
+# Verificar se está rodando
+docker ps | grep horizon-ai-db
+```
+
+#### Opção B: PostgreSQL Local (sem Docker)
+
+```bash
+# macOS com Homebrew
+brew install postgresql@15
+brew services start postgresql@15
+
+# Criar banco de dados
+createdb horizon_ai
+
+# Conectar
+psql horizon_ai
+```
+
+#### Opção C: Supabase (PostgreSQL em nuvem)
+
+1. Criar conta em [supabase.com](https://supabase.com)
+2. Criar novo projeto
+3. Copiar `DATABASE_URL` da configuração
+
+### 2. Configurar Variáveis de Ambiente
+
+```bash
+# Copiar template
+cp .env.example .env.local
+
+# Editar .env.local (na raiz do monorepo!)
+# Exemplo para PostgreSQL local:
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/horizon_ai
+
+# Ou para Supabase:
+# DATABASE_URL=postgresql://postgres:password@db.project.supabase.co:5432/postgres
+```
+
+### 3. Executar Migrations
+
+```bash
+# Aplicar todas as migrations ao banco
+pnpm db:push
+
+# Ou abrir UI visual do Drizzle
+pnpm db:studio
+```
+
+### 4. Instalar dependências e rodar
+
+```bash
+# Install dependencies (na raiz do monorepo)
 pnpm install
 
-# Configurar .env com suas credenciais Supabase
-# SUPABASE_URL=https://xxxx.supabase.co
-# SUPABASE_KEY=seu_anon_public_key
-
 # Start development server with hot reload
-pnpm dev
+pnpm -F @horizon-ai/api dev
 ```
 
 ## Desenvolvimento
 
+### Comandos do Banco de Dados
+
 ```bash
-# Start dev server (port 3001)
-pnpm dev
+# Gerar nova migration baseada em mudanças do schema.ts
+pnpm db:generate
+
+# Aplicar migrations ao banco de dados
+pnpm db:push
+
+# Executar migrations (alternativa)
+pnpm db:migrate
+
+# Abrir Drizzle Studio (UI visual para explorar dados)
+pnpm db:studio
+
+# Deletar todas as tabelas (CUIDADO!)
+pnpm db:drop
+```
+
+### Desenvolvimento da API
+
+```bash
+# Start dev server (port 8811)
+pnpm -F @horizon-ai/api dev
 
 # Run tests
-pnpm test
+pnpm -F @horizon-ai/api test
 
 # Run tests with coverage
-pnpm test:cov
+pnpm -F @horizon-ai/api test:cov
 
 # Lint
-pnpm lint
+pnpm -F @horizon-ai/api lint
 
 # Format
-pnpm format
+pnpm -F @horizon-ai/api format
+
+# Type check
+pnpm -F @horizon-ai/api typecheck
+```
+
+## Drizzle ORM & Migrations
+
+### Estrutura
+
+```text
+apps/api/
+├── src/database/
+│   ├── schema.ts           # Definição de tabelas
+│   ├── db.ts               # Instância Drizzle
+│   ├── database.module.ts  # Módulo NestJS
+│   └── migrations/         # SQL gerado automaticamente
+└── scripts/
+    └── db-command.sh       # Wrapper para db commands
+```
+
+### Fluxo de Trabalho: Adicionar Nova Tabela
+
+1. **Editar schema.ts**
+
+```typescript
+// apps/api/src/database/schema.ts
+import { pgTable, uuid, text, timestamp } from 'drizzle-orm/pg-core';
+
+export const posts = pgTable('posts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  content: text('content'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+```
+
+1. **Gerar migration**
+
+```bash
+pnpm db:generate
+# Gera arquivo SQL em apps/api/src/database/migrations/
+```
+
+1. **Revisar arquivo SQL gerado**
+
+```bash
+# O arquivo será criado em apps/api/src/database/migrations/
+cat apps/api/src/database/migrations/0001_*.sql
+```
+
+1. **Aplicar migration ao banco**
+
+```bash
+pnpm db:push
+```
+
+1. **Usar em seus serviços**
+
+```typescript
+import { db } from './database/db';
+import { posts } from './database/schema';
+
+// Query
+const allPosts = await db.select().from(posts);
+
+// Insert
+await db.insert(posts).values({
+  title: 'Hello World',
+  content: 'My first post',
+});
+
+// Update
+await db.update(posts).set({ title: 'Updated' }).where(eq(posts.id, id));
+
+// Delete
+await db.delete(posts).where(eq(posts.id, id));
+```
+
+### Troubleshooting
+
+#### ❌ "DATABASE_URL não configurada"
+
+```bash
+# Verificar se .env.local existe na RAIZ do monorepo
+cat ../../.env.local | grep DATABASE_URL
+```
+
+#### ❌ "Erro ao conectar ao banco"
+
+```bash
+# Testar conexão
+psql "$DATABASE_URL" -c "SELECT 1"
+
+# Ou com Docker
+docker ps | grep horizon-ai-db
+```
+
+#### ❌ "Migration não foi aplicada"
+
+```bash
+# Abrir Studio e verificar status
+pnpm db:studio
+# Acesse http://localhost:3000
 ```
 
 ## Build e Produção
