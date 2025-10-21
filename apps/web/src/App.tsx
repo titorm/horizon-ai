@@ -32,6 +32,7 @@ import ShoppingListScreen from "./screens/ShoppingListScreen";
 
 import type { Bank, Screen, User } from "./types";
 import { MOCK_USER } from "./constants";
+import { apiEndpoints, apiFetch } from "./config/api";
 
 const USER_STORAGE_KEY = "horizonUser";
 
@@ -86,12 +87,27 @@ function App() {
         showToast("Account created successfully!", "success");
     };
 
-    const handleLogin = () => {
-        setUser(MOCK_USER);
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(MOCK_USER));
-        setScreen("dashboard/overview");
-        showToast(`Welcome back, ${MOCK_USER.name}!`, "success");
-        simulateLoading();
+    const handleLogin = async (email: string, password: string) => {
+        try {
+            const res = await apiFetch(apiEndpoints.auth.signIn, {
+                method: "POST",
+                body: JSON.stringify({ email, password }),
+            });
+            if (!res.ok) {
+                const error = await res.json();
+                showToast(error.message || "Login failed", "error");
+                return;
+            }
+            const data = await res.json();
+            setUser(data.user);
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data.user));
+            setScreen("dashboard/overview");
+            showToast(`Welcome back, ${data.user.name || "user"}!`, "success");
+            simulateLoading();
+        } catch (err) {
+            console.log(err);
+            showToast("Network error. Try again.", "error");
+        }
     };
 
     const handleConnect = () => setScreen("onboarding/select-bank");

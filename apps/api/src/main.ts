@@ -7,8 +7,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Enable CORS
+  const corsOrigins = process.env.CORS_ORIGIN?.split(',') || [
+    'http://localhost:5173', // Vite dev server
+    'http://localhost:3000',  // Alternative dev server
+    'http://localhost:8801',  // Legacy
+  ];
+  
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || ['http://localhost:5173', 'http://localhost:3000'],
+    origin: corsOrigins,
     credentials: true,
   });
 

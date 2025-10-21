@@ -5,12 +5,14 @@ import Card from "../components/ui/Card";
 import { ArrowLeftIcon } from "../assets/Icons";
 
 interface LoginScreenProps {
-    onLogin: () => void;
+    onLogin: (email: string, password: string) => void;
     onBack: () => void;
     onGoToRegister: () => void;
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack, onGoToRegister }) => {
+    const [email, setEmail] = React.useState("");
+    const [password, setPassword] = React.useState("");
     return (
         <div className="min-h-screen bg-surface flex flex-col items-center justify-center p-4">
             <div className="w-full max-w-md">
@@ -29,11 +31,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onBack, onGoToRegist
                         className="space-y-4"
                         onSubmit={(e) => {
                             e.preventDefault();
-                            onLogin();
+                            onLogin(email, password);
                         }}
                     >
-                        <Input id="email" label="Email Address" type="email" placeholder="you@example.com" required />
-                        <Input id="password" label="Password" type="password" required />
+                        <Input id="email" label="Email Address" type="email" placeholder="you@example.com" required value={email} onChange={e => setEmail(e.target.value)} />
+                        <Input id="password" label="Password" type="password" required value={password} onChange={e => setPassword(e.target.value)} />
                         <Button type="submit" className="w-full">
                             Sign In
                         </Button>
