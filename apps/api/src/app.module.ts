@@ -12,10 +12,7 @@ import { DatabaseModule } from './database/database.module';
     ConfigModule.forRoot({
       isGlobal: true,
       // Carregar .env.local ou .env da raiz do monorepo
-      envFilePath: [
-        path.resolve(__dirname, '../../../.env.local'),
-        path.resolve(__dirname, '../../../.env'),
-      ],
+      envFilePath: [path.resolve(__dirname, '../../../.env.local'), path.resolve(__dirname, '../../../.env')],
     }),
     DatabaseModule,
     AuthModule,

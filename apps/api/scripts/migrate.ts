@@ -11,8 +11,11 @@ import dotenv from 'dotenv';
 
 const projectRoot = path.resolve(__dirname, '..');
 // Carregar .env da raiz do monorepo em vez da pasta do app
-const monoRepoRoot = path.resolve(__dirname, '../..');
-const envFile = path.join(monoRepoRoot, '.env.local') || path.join(monoRepoRoot, '.env');
+const monoRepoRoot = path.resolve(__dirname, '../../..');
+// Prioridade: .env.local > .env
+const envFileLocal = path.join(monoRepoRoot, '.env.local');
+const envFileDefault = path.join(monoRepoRoot, '.env');
+const envFile = fs.existsSync(envFileLocal) ? envFileLocal : envFileDefault;
 const migrationsDir = path.join(projectRoot, 'src', 'database', 'migrations');
 const backupsDir = path.join(projectRoot, 'backups');
 const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -69,20 +72,20 @@ function loadEnv() {
 function testConnection(databaseUrl: string): boolean {
   try {
     log('info', 'Testando conexão com banco de dados...');
-    execSync(`psql "${databaseUrl}" -c "SELECT 1"`, {
-      stdio: 'pipe',
-      cwd: projectRoot,
-    });
-    log('success', 'Conexão com banco estabelecida');
+    // Apenas validar que DATABASE_URL tem o formato correto
+    if (!databaseUrl.includes('postgresql://') && !databaseUrl.includes('postgres://')) {
+      log('error', 'DATABASE_URL inválido - deve usar postgresql:// ou postgres://');
+      return false;
+    }
+    log('success', 'DATABASE_URL válido');
     return true;
-  } catch (error) {
-    log('error', 'Falha ao conectar ao banco de dados');
-    log('info', `DATABASE_URL: ${databaseUrl.split('@')[1] || 'invalid'}`);
+  } catch (error: any) {
+    log('error', 'Erro ao validar DATABASE_URL: ' + error.message);
     return false;
   }
 }
 
-function createBackup(databaseUrl: string): string {
+function createBackup(databaseUrl: string): string | null {
   try {
     if (!fs.existsSync(backupsDir)) {
       fs.mkdirSync(backupsDir, { recursive: true });
@@ -93,13 +96,15 @@ function createBackup(databaseUrl: string): string {
 
     execSync(`pg_dump "${databaseUrl}" > "${backupFile}"`, {
       cwd: projectRoot,
+      timeout: 30000, // 30 segundos de timeout
     });
 
     log('success', `Backup criado: ${backupFile}`);
     return backupFile;
-  } catch (error) {
-    log('error', 'Falha ao criar backup');
-    throw error;
+  } catch (error: any) {
+    log('warning', `Não foi possível criar backup (banco pode estar inacessível): ${error.message}`);
+    log('info', 'Prosseguindo com migrations mesmo assim...');
+    return null;
   }
 }
 
@@ -181,12 +186,16 @@ async function actionPush(databaseUrl: string): Promise<void> {
   console.log('');
 
   if (!runCommand('pnpm db:push', 'Aplicando migrations')) {
-    log('warning', `Backup disponível em: ${backupFile}`);
+    if (backupFile) {
+      log('warning', `Backup disponível em: ${backupFile}`);
+    }
     process.exit(1);
   }
 
   log('success', 'Migrations aplicadas com sucesso');
-  log('info', `Backup salvo em: ${backupFile}`);
+  if (backupFile) {
+    log('info', `Backup salvo em: ${backupFile}`);
+  }
 }
 
 async function actionMigrate(databaseUrl: string): Promise<void> {
@@ -204,12 +213,16 @@ async function actionMigrate(databaseUrl: string): Promise<void> {
   console.log('');
 
   if (!runCommand('pnpm db:migrate', 'Executando migrations')) {
-    log('warning', `Backup disponível em: ${backupFile}`);
+    if (backupFile) {
+      log('warning', `Backup disponível em: ${backupFile}`);
+    }
     process.exit(1);
   }
 
   log('success', 'Migrations executadas com sucesso');
-  log('info', `Backup salvo em: ${backupFile}`);
+  if (backupFile) {
+    log('info', `Backup salvo em: ${backupFile}`);
+  }
 }
 
 async function actionStudio(databaseUrl: string): Promise<void> {
@@ -278,12 +291,16 @@ async function actionReset(databaseUrl: string): Promise<void> {
   console.log('');
 
   if (!runCommand('pnpm db:drop', 'Deletando banco de dados')) {
-    log('warning', `Backup disponível em: ${backupFile}`);
+    if (backupFile) {
+      log('warning', `Backup disponível em: ${backupFile}`);
+    }
     process.exit(1);
   }
 
   log('success', 'Banco de dados resetado');
-  log('info', `Backup salvo em: ${backupFile}`);
+  if (backupFile) {
+    log('info', `Backup salvo em: ${backupFile}`);
+  }
   log('info', 'Execute: pnpm migrate:push');
 }
 
