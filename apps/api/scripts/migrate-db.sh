@@ -17,8 +17,13 @@ NC='\033[0m' # No Color
 # Configurações
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 API_DIR="$PROJECT_ROOT"
+# Carregar .env da raiz do monorepo em vez da pasta do app
+MONO_REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+ENV_FILE="${MONO_REPO_ROOT}/.env.local"
+if [ ! -f "$ENV_FILE" ]; then
+    ENV_FILE="${MONO_REPO_ROOT}/.env"
+fi
 MIGRATIONS_DIR="$API_DIR/src/database/migrations"
-ENV_FILE="$API_DIR/.env"
 BACKUP_DIR="$API_DIR/backups"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
@@ -420,7 +425,7 @@ EXEMPLOS:
 
 CONFIGURAÇÃO:
 
-  1. Configure DATABASE_URL em apps/api/.env
+  1. Configure DATABASE_URL em .env ou .env.local (raiz do monorepo)
   2. Execute: ./scripts/migrate-db.sh push
 
 BACKUPS:
@@ -431,7 +436,7 @@ BACKUPS:
 TROUBLESHOOTING:
 
   ❌ "DATABASE_URL não configurada"
-     → Configure em apps/api/.env
+     → Configure em .env ou .env.local (raiz do monorepo)
 
   ❌ "Falha ao conectar ao banco"
      → Verifique se PostgreSQL está rodando

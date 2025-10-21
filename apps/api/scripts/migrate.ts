@@ -10,7 +10,9 @@ import dotenv from 'dotenv';
 // ============================================================================
 
 const projectRoot = path.resolve(__dirname, '..');
-const envFile = path.join(projectRoot, '.env');
+// Carregar .env da raiz do monorepo em vez da pasta do app
+const monoRepoRoot = path.resolve(__dirname, '../..');
+const envFile = path.join(monoRepoRoot, '.env.local') || path.join(monoRepoRoot, '.env');
 const migrationsDir = path.join(projectRoot, 'src', 'database', 'migrations');
 const backupsDir = path.join(projectRoot, 'backups');
 const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -44,9 +46,7 @@ function log(type: 'info' | 'success' | 'warning' | 'error', message: string) {
   };
 
   const timestamp = new Date().toLocaleTimeString();
-  console.log(
-    `${colorCodes[type]}${icons[type]} [${timestamp}] ${type.toUpperCase()}: ${message}${colors.reset}`,
-  );
+  console.log(`${colorCodes[type]}${icons[type]} [${timestamp}] ${type.toUpperCase()}: ${message}${colors.reset}`);
 }
 
 function loadEnv() {
@@ -122,9 +122,7 @@ function listMigrations(): number {
   files.forEach((file, index) => {
     const filePath = path.join(migrationsDir, file);
     const stats = fs.statSync(filePath);
-    console.log(
-      `  ${colors.blue}▸${colors.reset} ${file.padEnd(50)} (${stats.size} bytes)`,
-    );
+    console.log(`  ${colors.blue}▸${colors.reset} ${file.padEnd(50)} (${stats.size} bytes)`);
   });
 
   console.log('');
@@ -265,9 +263,7 @@ async function actionReset(databaseUrl: string): Promise<void> {
   log('warning', 'AÇÃO DESTRUTIVA: Todas as tabelas e dados serão deletados!');
 
   const answer = await new Promise<string>((resolve) => {
-    process.stdout.write(
-      `${colors.yellow}⚠️  Digite 'RESETAR' para confirmar: ${colors.reset}`,
-    );
+    process.stdout.write(`${colors.yellow}⚠️  Digite 'RESETAR' para confirmar: ${colors.reset}`);
     process.stdin.once('data', (data) => {
       resolve(data.toString().trim());
     });
@@ -327,13 +323,13 @@ ${colors.blue}EXEMPLOS:${colors.reset}
 
 ${colors.blue}CONFIGURAÇÃO:${colors.reset}
 
-  1. Configure DATABASE_URL em .env
+  1. Configure DATABASE_URL em .env ou .env.local (raiz do monorepo)
   2. Execute: pnpm migrate push
 
 ${colors.blue}TROUBLESHOOTING:${colors.reset}
 
   ❌ "DATABASE_URL não configurada"
-     → Configure em apps/api/.env
+     → Configure em .env ou .env.local (raiz do monorepo)
 
   ❌ "Falha ao conectar ao banco"
      → Verifique se PostgreSQL está rodando

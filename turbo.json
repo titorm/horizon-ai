@@ -2,11 +2,24 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "globalDependencies": [
-    "**/.env",
-    "**/.env.local",
+    ".env",
+    ".env.local",
     "tsconfig.json"
   ],
   "globalEnv": [
+    "NODE_ENV",
+    "PORT",
+    "API_URL",
+    "DATABASE_URL",
+    "JWT_SECRET",
+    "JWT_EXPIRATION",
+    "JWT_REFRESH_SECRET",
+    "JWT_REFRESH_EXPIRATION",
+    "COOKIE_MAX_AGE",
+    "COOKIE_SECURE",
+    "COOKIE_HTTP_ONLY",
+    "COOKIE_SAME_SITE",
+    "CORS_ORIGIN",
     "GEMINI_API_KEY"
   ],
   "tasks": {
