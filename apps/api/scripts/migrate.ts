@@ -60,13 +60,20 @@ function loadEnv() {
 
   dotenv.config({ path: envFile });
 
+  // Prefer DATABASE_URL, otherwise build one from host/port/user/pass (or Supabase vars)
   const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    log('error', 'DATABASE_URL não está configurada em .env');
-    process.exit(1);
-  }
+  if (databaseUrl) return databaseUrl;
 
-  return databaseUrl;
+  const host = process.env.DATABASE_HOST || process.env.SUPABASE_DB_HOST || 'localhost';
+  const port = process.env.DATABASE_PORT || process.env.SUPABASE_DB_PORT || '5432';
+  const user = process.env.DATABASE_USERNAME || process.env.SUPABASE_DB_USER || 'postgres';
+  const pass = process.env.DATABASE_PASSWORD || process.env.SUPABASE_DB_PASSWORD || '';
+  const db = process.env.DATABASE_NAME || process.env.SUPABASE_DB_NAME || 'postgres';
+
+  const built = `postgresql://${encodeURIComponent(user)}:${encodeURIComponent(pass)}@${host}:${port}/${db}`;
+  log('info', 'DATABASE_URL não encontrada — construindo a partir das variáveis de host/port/user');
+  log('info', `Usando: ${built}`);
+  return built;
 }
 
 function testConnection(databaseUrl: string): boolean {
@@ -212,14 +219,16 @@ async function actionMigrate(databaseUrl: string): Promise<void> {
   const backupFile = createBackup(databaseUrl);
   console.log('');
 
-  if (!runCommand('pnpm db:migrate', 'Executando migrations')) {
+  // Delegate to src/database/migrate (TypeScript) so it can use DATABASE_URL or Supabase vars
+  const tsCommand = `pnpm -w dlx ts-node ${path.join(projectRoot, 'src', 'database', 'migrate.ts')}`;
+  if (!runCommand(tsCommand, 'Executando migrations (src/database/migrate.ts)')) {
     if (backupFile) {
       log('warning', `Backup disponível em: ${backupFile}`);
     }
     process.exit(1);
   }
 
-  log('success', 'Migrations executadas com sucesso');
+  log('success', 'Migrations executadas com sucesso via src/database/migrate.ts');
   if (backupFile) {
     log('info', `Backup salvo em: ${backupFile}`);
   }
