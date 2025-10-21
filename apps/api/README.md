@@ -68,7 +68,7 @@ pnpm start:prod
 
 #### Sign Up
 
-```
+```bash
 POST /auth/sign-up
 Content-Type: application/json
 
@@ -93,7 +93,7 @@ Response: 201
 
 #### Sign In
 
-```
+```bash
 POST /auth/sign-in
 Content-Type: application/json
 
@@ -116,7 +116,7 @@ Response: 200
 
 #### Get Current User
 
-```
+```bash
 GET /auth/me
 Authorization: Bearer <token>
 
@@ -133,7 +133,7 @@ Response: 200
 
 #### Sign Out
 
-```
+```bash
 POST /auth/sign-out
 
 Response: 200
@@ -144,7 +144,7 @@ Response: 200
 
 ### Health Check
 
-```
+```bash
 GET /health
 
 Response: 200
@@ -155,7 +155,7 @@ Response: 200
 
 ## Estrutura do Projeto
 
-```
+```mermaid
 src/
 ├── auth/                 # Autenticação
 │   ├── dto/             # Data Transfer Objects
