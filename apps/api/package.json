@@ -14,7 +14,11 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "gen:name": "/Users/titorm/Documents/horizon-ai/apps/api/scripts/generate-name.sh 5 \"_\""
+    "gen:name": "/Users/titorm/Documents/horizon-ai/apps/api/scripts/generate-name.sh 5 \"_\"",
+    "migrate:up": "ts-node src/database/migrations/cli.ts up",
+    "migrate:down": "ts-node src/database/migrations/cli.ts down",
+    "migrate:status": "ts-node src/database/migrations/cli.ts status",
+    "migrate:reset": "ts-node src/database/migrations/cli.ts reset"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
