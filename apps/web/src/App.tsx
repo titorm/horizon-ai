@@ -80,11 +80,33 @@ function App() {
     const handleGoToRegister = () => setScreen("register");
     const handleGoToLogin = () => setScreen("login");
 
-    const handleRegister = () => {
-        setUser(MOCK_USER);
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(MOCK_USER));
-        setScreen("welcome");
-        showToast("Account created successfully!", "success");
+    const handleRegister = async (email: string, password: string, firstName: string, lastName?: string) => {
+        try {
+            const res = await apiFetch(apiEndpoints.auth.signUp, {
+                method: "POST",
+                body: JSON.stringify({ email, password, firstName, lastName }),
+            });
+            if (!res.ok) {
+                const error = await res.json();
+                showToast(error.message || "Registration failed", "error");
+                return;
+            }
+            const data = await res.json();
+            // Map backend user response to frontend User type
+            const newUser = {
+                id: data.user.id,
+                name: data.user.firstName || "User",
+                email: data.user.email,
+                role: "FREE" as const,
+            };
+            setUser(newUser);
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
+            setScreen("welcome");
+            showToast("Account created successfully!", "success");
+        } catch (err) {
+            console.error(err);
+            showToast("Network error. Try again.", "error");
+        }
     };
 
     const handleLogin = async (email: string, password: string) => {
@@ -99,13 +121,20 @@ function App() {
                 return;
             }
             const data = await res.json();
-            setUser(data.user);
-            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data.user));
+            // Map backend user response to frontend User type
+            const loggedInUser = {
+                id: data.user.id,
+                name: data.user.firstName || "User",
+                email: data.user.email,
+                role: "FREE" as const,
+            };
+            setUser(loggedInUser);
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(loggedInUser));
             setScreen("dashboard/overview");
-            showToast(`Welcome back, ${data.user.name || "user"}!`, "success");
+            showToast(`Welcome back, ${loggedInUser.name}!`, "success");
             simulateLoading();
         } catch (err) {
-            console.log(err);
+            console.error(err);
             showToast("Network error. Try again.", "error");
         }
     };
@@ -148,11 +177,22 @@ function App() {
         }
     };
 
-    const handleLogout = () => {
-        setUser(null);
-        setSelectedBank(null);
-        localStorage.removeItem(USER_STORAGE_KEY);
-        setScreen("landing");
+    const handleLogout = async () => {
+        try {
+            // Call backend to clear auth cookie
+            await apiFetch(apiEndpoints.auth.signOut, {
+                method: "POST",
+            });
+        } catch (err) {
+            console.error("Logout error:", err);
+        } finally {
+            // Clear local state regardless of API call result
+            setUser(null);
+            setSelectedBank(null);
+            localStorage.removeItem(USER_STORAGE_KEY);
+            setScreen("landing");
+            showToast("Logged out successfully", "success");
+        }
     };
 
     const renderCurrentScreen = () => {

@@ -1,12 +1,16 @@
-import { Injectable, ConflictException, UnauthorizedException, Logger, Inject } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import * as bcrypt from 'bcrypt';
-import { eq } from 'drizzle-orm';
 import { SignUpDto, SignInDto, AuthResponseDto } from './dto';
-import { db } from '@/database/db';
-import { users } from '@/database/schema';
-import type { User } from '@/database/schema';
+import { getAppwriteAccount, generateId } from '@/appwrite/appwrite.client';
+import { AppwriteException, ID } from 'node-appwrite';
+
+interface AppwriteUser {
+  $id: string;
+  email: string;
+  name: string;
+  prefs?: Record<string, any>;
+}
 
 @Injectable()
 export class AuthService {
@@ -20,100 +24,131 @@ export class AuthService {
   async signUp(signUpDto: SignUpDto): Promise<AuthResponseDto> {
     const { email, password, firstName, lastName } = signUpDto;
 
-    // Check if user already exists
-    const existingUser = await db.query.users.findFirst({
-      where: eq(users.email, email),
-    });
+    this.logger.log(`Sign up attempt for email: ${email}`);
 
-    if (existingUser) {
-      throw new ConflictException('Email already in use');
+    try {
+      const account = getAppwriteAccount();
+
+      // Create user in Appwrite
+      const userId = generateId();
+      const name = [firstName, lastName].filter(Boolean).join(' ') || email.split('@')[0];
+
+      const user = await account.create(userId, email, password, name);
+
+      this.logger.log(`User created successfully: ${user.$id}`);
+
+      // Note: Appwrite preferences are updated per session, not per user account
+      // For now, we'll store firstName/lastName in the name field
+
+      // Generate JWT token
+      const accessToken = this.generateAccessToken({
+        $id: user.$id,
+        email: user.email,
+        name: user.name,
+        prefs: { firstName, lastName },
+      });
+
+      return {
+        id: user.$id,
+        email: user.email,
+        firstName: firstName,
+        lastName: lastName,
+        accessToken,
+      };
+    } catch (error) {
+      if (error instanceof AppwriteException) {
+        this.logger.warn(`Sign up failed: ${error.message} - ${email}`);
+
+        // Check for duplicate email
+        if (error.code === 409 || (error.message.includes('user') && error.message.includes('already exists'))) {
+          throw new ConflictException('Email already in use');
+        }
+
+        throw new ConflictException(error.message);
+      }
+
+      this.logger.error(`Sign up error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw error;
     }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create user
-    const newUsers = await db
-      .insert(users)
-      .values({
-        email,
-        password: hashedPassword,
-        firstName: firstName || null,
-        lastName: lastName || null,
-        isActive: true,
-      })
-      .returning();
-
-    const user = newUsers[0];
-
-    // Generate token
-    const accessToken = this.generateAccessToken(user);
-
-    return {
-      id: user.id,
-      email: user.email,
-      firstName: user.firstName ?? undefined,
-      lastName: user.lastName ?? undefined,
-      accessToken,
-    };
   }
 
   async signIn(signInDto: SignInDto): Promise<AuthResponseDto> {
     const { email, password } = signInDto;
 
-    // Find user
-    const user = await db.query.users.findFirst({
-      where: eq(users.email, email),
-    });
+    this.logger.log(`Sign in attempt for email: ${email}`);
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid email or password');
+    try {
+      const account = getAppwriteAccount();
+
+      // Create email session in Appwrite
+      const session = await account.createEmailPasswordSession(email, password);
+
+      // Get user details
+      const user = await account.get();
+
+      this.logger.log(`User signed in successfully: ${user.$id}`);
+
+      // Parse name into firstName/lastName
+      const nameParts = user.name.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || undefined;
+
+      // Generate JWT token
+      const accessToken = this.generateAccessToken({
+        $id: user.$id,
+        email: user.email,
+        name: user.name,
+        prefs: user.prefs || {},
+      });
+
+      return {
+        id: user.$id,
+        email: user.email,
+        firstName,
+        lastName,
+        accessToken,
+      };
+    } catch (error) {
+      if (error instanceof AppwriteException) {
+        this.logger.warn(`Sign in failed: ${error.message} - ${email}`);
+
+        // Invalid credentials
+        if (error.code === 401) {
+          throw new UnauthorizedException('Invalid email or password');
+        }
+
+        throw new UnauthorizedException(error.message);
+      }
+
+      this.logger.error(`Sign in error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw error;
     }
-
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
-
-    // Check if user is active
-    if (!user.isActive) {
-      throw new UnauthorizedException('User account is inactive');
-    }
-
-    // Generate token
-    const accessToken = this.generateAccessToken(user);
-
-    return {
-      id: user.id,
-      email: user.email,
-      firstName: user.firstName ?? undefined,
-      lastName: user.lastName ?? undefined,
-      accessToken,
-    };
   }
 
-  async validateUser(email: string, password: string): Promise<User> {
-    const user = await db.query.users.findFirst({
-      where: eq(users.email, email),
-    });
+  async validateUser(email: string, password: string): Promise<AppwriteUser> {
+    try {
+      const account = getAppwriteAccount();
 
-    if (!user) {
+      // Try to create session to validate credentials
+      await account.createEmailPasswordSession(email, password);
+      const user = await account.get();
+
+      return {
+        $id: user.$id,
+        email: user.email,
+        name: user.name,
+        prefs: user.prefs,
+      };
+    } catch (error) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    return user;
   }
 
-  private generateAccessToken(user: User): string {
+  private generateAccessToken(user: AppwriteUser): string {
     const payload = {
-      sub: user.id,
+      sub: user.$id,
       email: user.email,
+      name: user.name,
     };
 
     return this.jwtService.sign(payload, {
@@ -122,15 +157,24 @@ export class AuthService {
     });
   }
 
-  async getCurrentUser(userId: string): Promise<User> {
-    const user = await db.query.users.findFirst({
-      where: eq(users.id, userId),
-    });
+  async getCurrentUser(userId: string): Promise<AppwriteUser> {
+    try {
+      const account = getAppwriteAccount();
+      const user = await account.get();
 
-    if (!user) {
+      if (user.$id !== userId) {
+        throw new UnauthorizedException('User ID mismatch');
+      }
+
+      return {
+        $id: user.$id,
+        email: user.email,
+        name: user.name,
+        prefs: user.prefs,
+      };
+    } catch (error) {
+      this.logger.error(`Get current user error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw new UnauthorizedException('User not found');
     }
-
-    return user;
   }
 }

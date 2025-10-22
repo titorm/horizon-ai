@@ -9,8 +9,8 @@ export const apiEndpoints = {
   auth: {
     signIn: `${API_URL}/auth/sign-in`,
     signUp: `${API_URL}/auth/sign-up`,
-    logout: `${API_URL}/auth/logout`,
-    refresh: `${API_URL}/auth/refresh`,
+    signOut: `${API_URL}/auth/sign-out`,
+    me: `${API_URL}/auth/me`,
   },
   users: {
     profile: `${API_URL}/users/profile`,

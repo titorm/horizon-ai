@@ -6,11 +6,11 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
-import { DatabaseModule } from '@/database/database.module';
+import { AppwriteModule } from '@/appwrite/appwrite.module';
 
 @Module({
   imports: [
-    DatabaseModule,
+    AppwriteModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

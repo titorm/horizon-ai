@@ -9,6 +9,7 @@ import {
   BadRequestException,
   HttpCode,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
@@ -18,6 +19,8 @@ import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
+
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
@@ -26,15 +29,23 @@ export class AuthController {
   @Post('sign-up')
   @HttpCode(HttpStatus.CREATED)
   async signUp(@Body() signUpDto: SignUpDto, @Res() res: Response): Promise<any> {
-    const { accessToken, ...authResponse } = await this.authService.signUp(signUpDto);
+    try {
+      const { accessToken, ...authResponse } = await this.authService.signUp(signUpDto);
 
-    // Set JWT token in secure cookie
-    this.setAuthCookie(res, accessToken);
+      // Set JWT token in secure cookie
+      this.setAuthCookie(res, accessToken);
 
-    return res.json({
-      message: 'User created successfully',
-      user: authResponse,
-    });
+      return res.json({
+        message: 'User created successfully',
+        user: authResponse,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Sign up error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error instanceof Error ? error.stack : '',
+      );
+      throw error;
+    }
   }
 
   @Post('sign-in')
@@ -44,15 +55,20 @@ export class AuthController {
       throw new BadRequestException('Email and password are required');
     }
 
-    const { accessToken, ...authResponse } = await this.authService.signIn(signInDto);
+    try {
+      const { accessToken, ...authResponse } = await this.authService.signIn(signInDto);
 
-    // Set JWT token in secure cookie
-    this.setAuthCookie(res, accessToken);
+      // Set JWT token in secure cookie
+      this.setAuthCookie(res, accessToken);
 
-    return res.json({
-      message: 'Signed in successfully',
-      user: authResponse,
-    });
+      return res.json({
+        message: 'Signed in successfully',
+        user: authResponse,
+      });
+    } catch (error) {
+      this.logger.error(`Sign in error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw error;
+    }
   }
 
   @Post('sign-out')
@@ -73,15 +89,25 @@ export class AuthController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async getCurrentUser(@Req() req: any): Promise<AuthResponseDto> {
-    const user = await this.authService.getCurrentUser(req.user.userId);
+    try {
+      const user = await this.authService.getCurrentUser(req.user.userId);
 
-    return {
-      id: user.id,
-      email: user.email,
-      firstName: user.firstName ?? undefined,
-      lastName: user.lastName ?? undefined,
-      accessToken: '', // Don't send token in response
-    };
+      // Parse name into firstName/lastName
+      const nameParts = user.name.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || undefined;
+
+      return {
+        id: user.$id,
+        email: user.email,
+        firstName,
+        lastName,
+        accessToken: '', // Don't send token in response
+      };
+    } catch (error) {
+      this.logger.error(`Get current user error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw error;
+    }
   }
 
   private setAuthCookie(res: Response, token: string): void {
