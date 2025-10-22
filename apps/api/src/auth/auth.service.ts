@@ -127,11 +127,27 @@ export class AuthService {
         prefs: user.prefs || {},
       });
 
+      // profile fields first_name/last_name were consolidated into `display_name` or `avatar`/address in schema
+      // Extract from profile.display_name or fallback to parts of user.name
+      const profileAny: any = userData.profile;
+      const profileFirst: string | undefined = profileAny?.display_name || undefined;
+      let pf: string | undefined = undefined;
+      let pl: string | undefined = undefined;
+      if (profileFirst) {
+        const parts = profileFirst.split(' ');
+        pf = parts[0];
+        pl = parts.slice(1).join(' ') || undefined;
+      } else if (user.name) {
+        const parts = user.name.split(' ');
+        pf = parts[0];
+        pl = parts.slice(1).join(' ') || undefined;
+      }
+
       return {
         id: user.$id,
         email: user.email,
-        firstName: userData.profile?.first_name,
-        lastName: userData.profile?.last_name,
+        firstName: pf,
+        lastName: pl,
         accessToken,
         user: userData.user,
         profile: userData.profile,

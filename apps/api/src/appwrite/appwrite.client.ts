@@ -1,9 +1,12 @@
-import { Client, Account, Databases, ID } from 'node-appwrite';
+import { Client, Account, Databases, ID, TablesDB } from 'node-appwrite';
+import AppwriteDBAdapter from './appwrite-db-adapter';
 
 // Appwrite client instance
 let client: Client | null = null;
 let account: Account | null = null;
-let databases: Databases | null = null;
+let databases: Databases | TablesDB | null = null;
+let tables: TablesDB | null = null;
+let dbAdapter: AppwriteDBAdapter | null = null;
 
 /**
  * Initialize Appwrite client
@@ -25,12 +28,25 @@ export function initializeAppwrite() {
 
   account = new Account(client);
   databases = new Databases(client);
+  // Try TablesDB if available in SDK
+  try {
+    tables = new TablesDB(client);
+    // prefer tables when SDK supports it
+    databases = tables;
+  } catch (err) {
+    // ignore, fall back to Databases
+    tables = null;
+  }
+
+  // Wrap with adapter so legacy call sites keep working
+  dbAdapter = new AppwriteDBAdapter(databases);
 
   console.log('✅ Appwrite client initialized successfully');
   console.log('   Endpoint:', endpoint);
   console.log('   Project ID:', projectId);
 
-  return { client, account, databases };
+  // Return databases adapter under `databases` so existing injected consumers work
+  return { client, account, databases: dbAdapter };
 }
 
 /**
@@ -56,11 +72,21 @@ export function getAppwriteAccount(): Account {
 /**
  * Get Appwrite Databases service
  */
-export function getAppwriteDatabases(): Databases {
-  if (!databases) {
+export function getAppwriteDatabases(): any {
+  if (!dbAdapter) {
     throw new Error('Appwrite client not initialized. Call initializeAppwrite() first.');
   }
-  return databases;
+  return dbAdapter;
+}
+
+/**
+ * Get raw TablesDB instance when available. Throws if TablesDB is not supported.
+ */
+export function getAppwriteTables(): TablesDB {
+  if (!tables) {
+    throw new Error('TablesDB is not available in the current Appwrite SDK instance.');
+  }
+  return tables;
 }
 
 /**

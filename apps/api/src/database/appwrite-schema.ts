@@ -29,8 +29,17 @@ export const DATABASE_ID = process.env.APPWRITE_DATABASE_ID || 'horizon_ai_db';
 export const usersSchema = {
   collectionId: COLLECTIONS.USERS,
   name: 'Users',
-  permissions: ['read("users")', 'write("users")', 'create("users")', 'update("users")', 'delete("users")'],
+  // permissions and rowSecurity reflect the migration that created this table
+  permissions: ['read("any")', 'write("any")'],
+  rowSecurity: true,
   attributes: [
+    {
+      key: 'auth_user_id',
+      type: 'string',
+      size: 255,
+      required: true,
+      array: false,
+    },
     {
       key: 'email',
       type: 'string',
@@ -39,40 +48,34 @@ export const usersSchema = {
       array: false,
     },
     {
-      key: 'password_hash',
+      key: 'name',
       type: 'string',
-      size: 1000,
+      size: 255,
       required: true,
       array: false,
     },
     {
-      key: 'is_email_verified',
-      type: 'boolean',
-      required: true,
-      default: false,
-    },
-    {
-      key: 'is_active',
-      type: 'boolean',
-      required: true,
-      default: true,
-    },
-    {
-      key: 'last_login_at',
+      key: 'created_at',
       type: 'datetime',
-      required: false,
+      required: true,
+    },
+    {
+      key: 'updated_at',
+      type: 'datetime',
+      required: true,
     },
   ],
   indexes: [
     {
-      key: 'email_idx',
+      key: 'idx_auth_user_id',
       type: 'unique',
-      attributes: ['email'],
+      attributes: ['auth_user_id'],
     },
     {
-      key: 'is_active_idx',
+      key: 'idx_email',
       type: 'key',
-      attributes: ['is_active'],
+      attributes: ['email'],
+      orders: ['ASC'],
     },
   ],
 };
@@ -83,7 +86,8 @@ export const usersSchema = {
 export const userProfilesSchema = {
   collectionId: COLLECTIONS.USER_PROFILES,
   name: 'User Profiles',
-  permissions: ['read("users")', 'write("users")', 'create("users")', 'update("users")', 'delete("users")'],
+  permissions: ['read("any")', 'write("any")'],
+  rowSecurity: true,
   attributes: [
     {
       key: 'user_id',
@@ -93,21 +97,9 @@ export const userProfilesSchema = {
       array: false,
     },
     {
-      key: 'first_name',
+      key: 'bio',
       type: 'string',
-      size: 100,
-      required: false,
-    },
-    {
-      key: 'last_name',
-      type: 'string',
-      size: 100,
-      required: false,
-    },
-    {
-      key: 'display_name',
-      type: 'string',
-      size: 200,
+      size: 1000,
       required: false,
     },
     {
@@ -117,56 +109,36 @@ export const userProfilesSchema = {
       required: false,
     },
     {
-      key: 'phone_number',
+      key: 'phone',
       type: 'string',
-      size: 20,
-      required: false,
-    },
-    {
-      key: 'date_of_birth',
-      type: 'datetime',
+      size: 50,
       required: false,
     },
     {
       key: 'address',
       type: 'string',
-      size: 10000, // JSON stringified
+      size: 5000,
       required: false,
     },
     {
-      key: 'bio',
-      type: 'string',
-      size: 2000,
+      key: 'birthdate',
+      type: 'datetime',
       required: false,
     },
     {
-      key: 'occupation',
-      type: 'string',
-      size: 100,
-      required: false,
+      key: 'created_at',
+      type: 'datetime',
+      required: true,
     },
     {
-      key: 'company',
-      type: 'string',
-      size: 100,
-      required: false,
-    },
-    {
-      key: 'website',
-      type: 'string',
-      size: 255,
-      required: false,
-    },
-    {
-      key: 'social_links',
-      type: 'string',
-      size: 2000, // JSON stringified
-      required: false,
+      key: 'updated_at',
+      type: 'datetime',
+      required: true,
     },
   ],
   indexes: [
     {
-      key: 'user_id_idx',
+      key: 'idx_user_id',
       type: 'unique',
       attributes: ['user_id'],
     },
@@ -179,7 +151,8 @@ export const userProfilesSchema = {
 export const userPreferencesSchema = {
   collectionId: COLLECTIONS.USER_PREFERENCES,
   name: 'User Preferences',
-  permissions: ['read("users")', 'write("users")', 'create("users")', 'update("users")', 'delete("users")'],
+  permissions: ['read("any")', 'write("any")'],
+  rowSecurity: true,
   attributes: [
     {
       key: 'user_id',
@@ -188,105 +161,50 @@ export const userPreferencesSchema = {
       required: true,
       array: false,
     },
-    // Visual Preferences
     {
       key: 'theme',
-      type: 'string',
-      size: 20,
+      type: 'enum',
+      elements: ['light', 'dark', 'system'],
       required: true,
-      default: 'system',
     },
     {
       key: 'language',
       type: 'string',
       size: 10,
       required: true,
-      default: 'pt-BR',
     },
     {
       key: 'currency',
       type: 'string',
       size: 10,
       required: true,
-      default: 'BRL',
     },
-    // Dashboard Preferences
     {
-      key: 'default_dashboard_view',
+      key: 'timezone',
       type: 'string',
-      size: 50,
-      required: false,
-      default: 'overview',
+      size: 100,
+      required: true,
     },
     {
-      key: 'dashboard_widgets',
+      key: 'notifications',
       type: 'string',
-      size: 10000, // JSON stringified
-      required: false,
-    },
-    // Notification Preferences
-    {
-      key: 'email_notifications',
-      type: 'boolean',
+      size: 5000,
       required: true,
-      default: true,
     },
     {
-      key: 'push_notifications',
-      type: 'boolean',
+      key: 'created_at',
+      type: 'datetime',
       required: true,
-      default: true,
     },
     {
-      key: 'sms_notifications',
-      type: 'boolean',
+      key: 'updated_at',
+      type: 'datetime',
       required: true,
-      default: false,
-    },
-    {
-      key: 'notification_frequency',
-      type: 'string',
-      size: 20,
-      required: true,
-      default: 'realtime',
-    },
-    // Financial Preferences
-    {
-      key: 'show_balances',
-      type: 'boolean',
-      required: true,
-      default: true,
-    },
-    {
-      key: 'auto_categorization_enabled',
-      type: 'boolean',
-      required: true,
-      default: true,
-    },
-    {
-      key: 'budget_alerts',
-      type: 'boolean',
-      required: true,
-      default: true,
-    },
-    // Privacy Preferences
-    {
-      key: 'profile_visibility',
-      type: 'string',
-      size: 20,
-      required: true,
-      default: 'private',
-    },
-    {
-      key: 'share_data_for_insights',
-      type: 'boolean',
-      required: true,
-      default: false,
     },
   ],
   indexes: [
     {
-      key: 'user_id_idx',
+      key: 'idx_user_id',
       type: 'unique',
       attributes: ['user_id'],
     },
@@ -299,7 +217,8 @@ export const userPreferencesSchema = {
 export const userSettingsSchema = {
   collectionId: COLLECTIONS.USER_SETTINGS,
   name: 'User Settings',
-  permissions: ['read("users")', 'write("users")', 'create("users")', 'update("users")', 'delete("users")'],
+  permissions: ['read("any")', 'write("any")'],
+  rowSecurity: true,
   attributes: [
     {
       key: 'user_id',
@@ -308,94 +227,51 @@ export const userSettingsSchema = {
       required: true,
       array: false,
     },
-    // Security Settings
     {
       key: 'two_factor_enabled',
       type: 'boolean',
       required: true,
-      default: false,
     },
     {
-      key: 'two_factor_method',
-      type: 'string',
-      size: 20,
-      required: false,
-    },
-    {
-      key: 'session_timeout',
-      type: 'integer',
+      key: 'email_verified',
+      type: 'boolean',
       required: true,
-      default: 30,
-      min: 5,
-      max: 1440,
     },
     {
-      key: 'password_last_changed_at',
+      key: 'phone_verified',
+      type: 'boolean',
+      required: true,
+    },
+    {
+      key: 'marketing_emails',
+      type: 'boolean',
+      required: true,
+    },
+    {
+      key: 'privacy_settings',
+      type: 'string',
+      size: 5000,
+      required: true,
+    },
+    {
+      key: 'created_at',
       type: 'datetime',
-      required: false,
-    },
-    // Data & Sync Settings
-    {
-      key: 'auto_sync_enabled',
-      type: 'boolean',
       required: true,
-      default: true,
     },
     {
-      key: 'sync_frequency',
-      type: 'integer',
+      key: 'updated_at',
+      type: 'datetime',
       required: true,
-      default: 60,
-      min: 1,
-      max: 1440,
-    },
-    {
-      key: 'cloud_backup_enabled',
-      type: 'boolean',
-      required: true,
-      default: true,
-    },
-    // Integration Settings (JSON stringified)
-    {
-      key: 'connected_banks',
-      type: 'string',
-      size: 50000,
-      required: false,
-    },
-    {
-      key: 'connected_apps',
-      type: 'string',
-      size: 50000,
-      required: false,
-    },
-    // Advanced Settings
-    {
-      key: 'beta_features',
-      type: 'boolean',
-      required: true,
-      default: false,
-    },
-    {
-      key: 'analytics_opt_in',
-      type: 'boolean',
-      required: true,
-      default: true,
-    },
-    {
-      key: 'custom_settings',
-      type: 'string',
-      size: 50000, // JSON stringified
-      required: false,
     },
   ],
   indexes: [
     {
-      key: 'user_id_idx',
+      key: 'idx_user_id',
       type: 'unique',
       attributes: ['user_id'],
     },
     {
-      key: 'two_factor_enabled_idx',
+      key: 'idx_two_factor_enabled',
       type: 'key',
       attributes: ['two_factor_enabled'],
     },
@@ -410,11 +286,11 @@ export interface User {
   $id: string;
   $createdAt: string;
   $updatedAt: string;
+  auth_user_id: string;
   email: string;
-  password_hash: string;
-  is_email_verified: boolean;
-  is_active: boolean;
-  last_login_at?: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface UserProfile {
@@ -422,18 +298,13 @@ export interface UserProfile {
   $createdAt: string;
   $updatedAt: string;
   user_id: string;
-  first_name?: string;
-  last_name?: string;
-  display_name?: string;
-  avatar_url?: string;
-  phone_number?: string;
-  date_of_birth?: string;
-  address?: string; // JSON string
   bio?: string;
-  occupation?: string;
-  company?: string;
-  website?: string;
-  social_links?: string; // JSON string
+  avatar_url?: string;
+  phone?: string;
+  address?: string; // JSON string
+  birthdate?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface UserPreferences {
@@ -442,19 +313,12 @@ export interface UserPreferences {
   $updatedAt: string;
   user_id: string;
   theme: 'light' | 'dark' | 'system';
-  language: 'pt-BR' | 'en-US' | 'es-ES';
-  currency: 'BRL' | 'USD' | 'EUR';
-  default_dashboard_view?: string;
-  dashboard_widgets?: string; // JSON string
-  email_notifications: boolean;
-  push_notifications: boolean;
-  sms_notifications: boolean;
-  notification_frequency: 'realtime' | 'daily' | 'weekly' | 'monthly' | 'never';
-  show_balances: boolean;
-  auto_categorization_enabled: boolean;
-  budget_alerts: boolean;
-  profile_visibility: string;
-  share_data_for_insights: boolean;
+  language: string;
+  currency: string;
+  timezone: string;
+  notifications: string; // JSON string
+  created_at: string;
+  updated_at: string;
 }
 
 export interface UserSettings {
@@ -463,15 +327,10 @@ export interface UserSettings {
   $updatedAt: string;
   user_id: string;
   two_factor_enabled: boolean;
-  two_factor_method?: string;
-  session_timeout: number;
-  password_last_changed_at?: string;
-  auto_sync_enabled: boolean;
-  sync_frequency: number;
-  cloud_backup_enabled: boolean;
-  connected_banks?: string; // JSON string
-  connected_apps?: string; // JSON string
-  beta_features: boolean;
-  analytics_opt_in: boolean;
-  custom_settings?: string; // JSON string
+  email_verified: boolean;
+  phone_verified: boolean;
+  marketing_emails: boolean;
+  privacy_settings: string; // JSON string
+  created_at: string;
+  updated_at: string;
 }
