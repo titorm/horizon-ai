@@ -6,6 +6,8 @@
 import { Client, TablesDB, ID, Query } from 'node-appwrite';
 import { Migration, MigrationContext, MigrationRecord } from './migration.interface';
 import { migrations } from './index';
+import fs from 'fs';
+import path from 'path';
 
 export class MigrationRunner {
   private databases: TablesDB;
@@ -55,6 +57,18 @@ export class MigrationRunner {
         appliedAt: new Date().toISOString(),
       },
     });
+
+    // Update local applied-migrations.json (append if missing)
+    try {
+      const filePath = path.resolve(__dirname, 'applied-migrations.json');
+      const existing: string[] = fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf-8')) : [];
+      if (!existing.includes(migration.id)) {
+        existing.push(migration.id);
+        fs.writeFileSync(filePath, JSON.stringify(existing, null, 2));
+      }
+    } catch (err) {
+      console.warn('Warning: failed to update applied-migrations.json');
+    }
   }
 
   /**
@@ -73,6 +87,18 @@ export class MigrationRunner {
         tableId: 'migrations',
         rowId: response.rows[0].$id,
       });
+    }
+
+    // Remove from local applied-migrations.json
+    try {
+      const filePath = path.resolve(__dirname, 'applied-migrations.json');
+      if (fs.existsSync(filePath)) {
+        const existing: string[] = JSON.parse(fs.readFileSync(filePath, 'utf-8')) || [];
+        const updated = existing.filter((id) => id !== migrationId);
+        fs.writeFileSync(filePath, JSON.stringify(updated, null, 2));
+      }
+    } catch (err) {
+      console.warn('Warning: failed to update applied-migrations.json during removal');
     }
   }
 

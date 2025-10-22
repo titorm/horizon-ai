@@ -37,12 +37,27 @@ See `/docs/MIGRATIONS.md` for complete guide.
 
 See `/docs/MIGRATIONS-QUICK-REF.md` for quick reference.
 
-## Creating New Migration
+## Creating New Migration (concise workflow)
 
-1. Create file: `YYYYMMDD_NNNNNN_description.ts`
-2. Implement `up()` and `down()` methods
-3. Register in `index.ts`
-4. Run `pnpm migrate:up`
+1. Create a new migration file under this folder and prefix it with a timestamp: `YYYYMMDD_NNNNNN_description.ts`.
+2. Implement `up(context: MigrationContext)` and `down(context: MigrationContext)` using the provided APIs.
+3. Register the migration in `index.ts` by importing it and appending it to the end of the `migrations` array.
+4. Commit the migration file and the `index.ts` change together.
+5. Run `pnpm migrate:up`.
+
+What happens when you run `migrate:up`:
+
+- The runner will apply pending migrations in order.
+
+- It will append applied migration ids to `applied-migrations.json` (this file is authoritative to prevent edits of already-applied migrations).
+
+- It will also attempt to write a record to the `migrations` table in Appwrite (best-effort).
+
+Rules:
+
+- NEVER edit migrations that are present in `applied-migrations.json`.
+
+- To change an applied schema, create a new migration that performs the required incremental changes.
 
 ## Environment Variables
 

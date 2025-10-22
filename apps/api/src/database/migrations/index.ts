@@ -9,6 +9,7 @@ import { migration as createUsersTable } from './20250123_000002_create_users_ta
 import { migration as createUserProfilesTable } from './20250123_000003_create_user_profiles_table';
 import { migration as createUserPreferencesTable } from './20250123_000004_create_user_preferences_table';
 import { migration as createUserSettingsTable } from './20250123_000005_create_user_settings_table';
+import { migration as syncSchemaWithAppwriteSchema } from './20251022_000006_sync_schema_with_appwrite_schema';
 
 /**
  * All migrations in order of execution
@@ -21,4 +22,5 @@ export const migrations: Migration[] = [
   createUserProfilesTable,
   createUserPreferencesTable,
   createUserSettingsTable,
+  syncSchemaWithAppwriteSchema,
 ];
