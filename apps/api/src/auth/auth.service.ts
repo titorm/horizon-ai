@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { SignUpDto, SignInDto, AuthResponseDto } from './dto';
 import { getAppwriteAccount, generateId } from '@/appwrite/appwrite.client';
 import { AppwriteException, ID } from 'node-appwrite';
+import { AppwriteUserService } from '@/database/services/appwrite-user.service';
 
 interface AppwriteUser {
   $id: string;
@@ -19,6 +20,7 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
+    private appwriteUserService: AppwriteUserService,
   ) {}
 
   async signUp(signUpDto: SignUpDto): Promise<AuthResponseDto> {
@@ -29,16 +31,38 @@ export class AuthService {
     try {
       const account = getAppwriteAccount();
 
-      // Create user in Appwrite
+      // Create user in Appwrite Auth
       const userId = generateId();
       const name = [firstName, lastName].filter(Boolean).join(' ') || email.split('@')[0];
 
       const user = await account.create(userId, email, password, name);
 
-      this.logger.log(`User created successfully: ${user.$id}`);
+      this.logger.log(`User created successfully in Appwrite Auth: ${user.$id}`);
 
-      // Note: Appwrite preferences are updated per session, not per user account
-      // For now, we'll store firstName/lastName in the name field
+      // Create user data in database with all references (profile, preferences, settings)
+      let userData;
+      try {
+        userData = await this.appwriteUserService.initializeUserDataWithId(
+          user.$id, // Use the ID from Appwrite Auth
+          {
+            email: user.email,
+            password_hash: 'managed_by_appwrite_auth', // Appwrite Auth manages passwords
+            is_email_verified: user.emailVerification || false,
+            is_active: true,
+          },
+          {
+            first_name: firstName,
+            last_name: lastName,
+            display_name: name,
+          },
+        );
+
+        this.logger.log(`User data initialized successfully in database for user: ${user.$id}`);
+      } catch (dbError) {
+        this.logger.error(`Failed to initialize user data in database: ${dbError}`);
+        // Continue even if database initialization fails
+        // The user is still created in Appwrite Auth
+      }
 
       // Generate JWT token
       const accessToken = this.generateAccessToken({
@@ -54,6 +78,10 @@ export class AuthService {
         firstName: firstName,
         lastName: lastName,
         accessToken,
+        user: userData?.user,
+        profile: userData?.profile,
+        preferences: userData?.preferences,
+        settings: userData?.settings,
       };
     } catch (error) {
       if (error instanceof AppwriteException) {
@@ -88,10 +116,8 @@ export class AuthService {
 
       this.logger.log(`User signed in successfully: ${user.$id}`);
 
-      // Parse name into firstName/lastName
-      const nameParts = user.name.split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || undefined;
+      // Get complete user data from database
+      const userData = await this.appwriteUserService.getCompleteUserData(user.$id);
 
       // Generate JWT token
       const accessToken = this.generateAccessToken({
@@ -104,9 +130,13 @@ export class AuthService {
       return {
         id: user.$id,
         email: user.email,
-        firstName,
-        lastName,
+        firstName: userData.profile?.first_name,
+        lastName: userData.profile?.last_name,
         accessToken,
+        user: userData.user,
+        profile: userData.profile,
+        preferences: userData.preferences,
+        settings: userData.settings,
       };
     } catch (error) {
       if (error instanceof AppwriteException) {
@@ -157,20 +187,35 @@ export class AuthService {
     });
   }
 
-  async getCurrentUser(userId: string): Promise<AppwriteUser> {
+  async getCurrentUser(userId: string) {
     try {
+      // Validate user in Appwrite Auth
       const account = getAppwriteAccount();
-      const user = await account.get();
+      const authUser = await account.get();
 
-      if (user.$id !== userId) {
+      if (authUser.$id !== userId) {
         throw new UnauthorizedException('User ID mismatch');
       }
 
+      // Get complete user data from database (user, profile, preferences, settings)
+      const userData = await this.appwriteUserService.getCompleteUserData(userId);
+
+      if (!userData.user) {
+        this.logger.warn(`User ${userId} exists in Auth but not in database`);
+        throw new UnauthorizedException('User data not found');
+      }
+
       return {
-        $id: user.$id,
-        email: user.email,
-        name: user.name,
-        prefs: user.prefs,
+        auth: {
+          $id: authUser.$id,
+          email: authUser.email,
+          name: authUser.name,
+          emailVerification: authUser.emailVerification,
+        },
+        user: userData.user,
+        profile: userData.profile,
+        preferences: userData.preferences,
+        settings: userData.settings,
       };
     } catch (error) {
       this.logger.error(`Get current user error: ${error instanceof Error ? error.message : 'Unknown error'}`);

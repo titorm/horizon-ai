@@ -88,21 +88,18 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async getCurrentUser(@Req() req: any): Promise<AuthResponseDto> {
+  async getCurrentUser(@Req() req: any) {
     try {
-      const user = await this.authService.getCurrentUser(req.user.userId);
-
-      // Parse name into firstName/lastName
-      const nameParts = user.name.split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || undefined;
+      const userData = await this.authService.getCurrentUser(req.user.userId);
 
       return {
-        id: user.$id,
-        email: user.email,
-        firstName,
-        lastName,
-        accessToken: '', // Don't send token in response
+        id: userData.auth.$id,
+        email: userData.auth.email,
+        emailVerification: userData.auth.emailVerification,
+        user: userData.user,
+        profile: userData.profile,
+        preferences: userData.preferences,
+        settings: userData.settings,
       };
     } catch (error) {
       this.logger.error(`Get current user error: ${error instanceof Error ? error.message : 'Unknown error'}`);

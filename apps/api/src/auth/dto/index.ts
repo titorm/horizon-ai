@@ -35,6 +35,10 @@ export class AuthResponseDto {
   firstName?: string;
   lastName?: string;
   accessToken!: string;
+  user?: any; // User document from database
+  profile?: any; // User profile document
+  preferences?: any; // User preferences document
+  settings?: any; // User settings document
 }
 
 export class UserDto {

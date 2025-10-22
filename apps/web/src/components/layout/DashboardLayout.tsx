@@ -1,26 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     HomeIcon,
     WalletIcon,
     SwapIcon,
     PieChartIcon,
     FileTextIcon,
-    BellIcon,
     SettingsIcon,
     HelpCircleIcon,
     LogOutIcon,
-    GiftIcon,
     ShieldCheckIcon,
     LandmarkIcon,
-    TrendingUpIcon,
     UsersIcon,
     RepeatIcon,
     ReceiptIcon,
     ShieldIcon,
-    CreditCardIcon,
     ShoppingCartIcon,
 } from "../../assets/Icons";
-import type { Screen, User } from "../../../types";
+import Modal from "../ui/Modal";
+import type { Screen, User } from "../../types";
 
 interface NavItemProps {
     icon: React.ReactNode;
@@ -57,6 +54,17 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, user, activeScreen, onNavigate, onLogout }) => {
+    const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+    const handleLogoutClick = () => {
+        setIsLogoutModalOpen(true);
+    };
+
+    const handleConfirmLogout = () => {
+        setIsLogoutModalOpen(false);
+        onLogout();
+    };
+
     const mainNav = [
         { id: "dashboard/overview", label: "Overview", icon: <HomeIcon className="w-5 h-5" /> },
         { id: "dashboard/accounts", label: "Accounts", icon: <WalletIcon className="w-5 h-5" /> },
@@ -165,7 +173,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, user, activ
                             label="Log Out"
                             icon={<LogOutIcon className="w-5 h-5" />}
                             isActive={false}
-                            onClick={onLogout}
+                            onClick={handleLogoutClick}
                         />
                     </nav>
                 </div>
@@ -174,6 +182,30 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, user, activ
             <main className="flex-1 overflow-y-auto">
                 <div className="p-6 md:p-10">{children}</div>
             </main>
+
+            {/* Logout Confirmation Modal */}
+            <Modal isOpen={isLogoutModalOpen} onClose={() => setIsLogoutModalOpen(false)} title="Confirmar Logout">
+                <div className="p-6">
+                    <p className="text-on-surface-variant mb-6">
+                        Tem certeza que deseja sair da sua conta? Você precisará fazer login novamente para acessar o
+                        sistema.
+                    </p>
+                    <div className="flex gap-3 justify-end">
+                        <button
+                            onClick={() => setIsLogoutModalOpen(false)}
+                            className="px-4 py-2 rounded-lg text-sm font-medium text-on-surface hover:bg-on-surface/5 transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={handleConfirmLogout}
+                            className="px-4 py-2 rounded-lg text-sm font-medium bg-error text-on-error hover:bg-error/90 transition-colors"
+                        >
+                            Sair
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };

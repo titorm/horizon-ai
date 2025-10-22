@@ -441,4 +441,57 @@ export class AppwriteUserService {
       settings,
     };
   }
+
+  /**
+   * Initialize user data with existing user ID (e.g., from Appwrite Auth)
+   * This creates the user document and all related documents with default values
+   */
+  async initializeUserDataWithId(
+    userId: string,
+    userData: {
+      email: string;
+      password_hash: string;
+      is_email_verified?: boolean;
+      is_active?: boolean;
+    },
+    profileData?: {
+      first_name?: string;
+      last_name?: string;
+      display_name?: string;
+      [key: string]: any;
+    },
+  ) {
+    // Create user document with specific ID
+    const document = await this.databases.createDocument(DATABASE_ID, COLLECTIONS.USERS, userId, {
+      email: userData.email,
+      password_hash: userData.password_hash,
+      is_email_verified: userData.is_email_verified ?? false,
+      is_active: userData.is_active ?? true,
+    });
+
+    const user = document as unknown as User;
+
+    // Create profile with default values
+    const profile = await this.createProfile({
+      user_id: userId,
+      ...profileData,
+    });
+
+    // Create default preferences
+    const preferences = await this.createPreferences({
+      user_id: userId,
+    });
+
+    // Create default settings
+    const settings = await this.createSettings({
+      user_id: userId,
+    });
+
+    return {
+      user,
+      profile,
+      preferences,
+      settings,
+    };
+  }
 }
