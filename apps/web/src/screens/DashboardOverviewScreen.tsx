@@ -1,13 +1,13 @@
-import React from "react";
+import React, { useMemo } from "react";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import {
     MOCK_BALANCE,
-    MOCK_TRANSACTIONS,
     MOCK_MONTHLY_INCOME,
     MOCK_MONTHLY_EXPENSES,
     MOCK_INSIGHTS,
     MOCK_CHART_DATA,
+    AVAILABLE_CATEGORY_ICONS,
 } from "../constants";
 import type { Transaction, User, FinancialInsight, InsightType } from "../types";
 import {
@@ -17,8 +17,10 @@ import {
     LineChartIcon,
     TrendingDownIcon,
     TrendingUpIcon,
+    SwapIcon,
 } from "../assets/Icons";
 import Skeleton from "../components/ui/Skeleton";
+import { useTransactions } from "../hooks/useTransactions";
 
 // --- BarChart Component Definition ---
 interface ChartData {
@@ -99,7 +101,7 @@ const BarChart: React.FC<{ data: ChartData[] }> = ({ data }) => {
                             {/* Tooltip */}
                             <div className="absolute bottom-full mb-2 w-40 p-2 bg-on-surface text-surface rounded-m text-xs shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                                 <p className="font-bold mb-1 text-center">{item.month} 2024</p>
-                                <p className="flex justify-between items-center">
+                                <div className="flex justify-between items-center">
                                     <span className="flex items-center gap-1.5">
                                         <div className="w-2 h-2 rounded-full bg-secondary"></div>
                                         <span className="text-surface/80">Income:</span>
@@ -107,8 +109,8 @@ const BarChart: React.FC<{ data: ChartData[] }> = ({ data }) => {
                                     <span>
                                         {item.income.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                                     </span>
-                                </p>
-                                <p className="flex justify-between items-center">
+                                </div>
+                                <div className="flex justify-between items-center">
                                     <span className="flex items-center gap-1.5">
                                         <div className="w-2 h-2 rounded-full bg-error"></div>
                                         <span className="text-surface/80">Expenses:</span>
@@ -116,7 +118,7 @@ const BarChart: React.FC<{ data: ChartData[] }> = ({ data }) => {
                                     <span>
                                         {item.expenses.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                                     </span>
-                                </p>
+                                </div>
                                 <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-on-surface -mb-1"></div>
                             </div>
                         </div>
@@ -297,7 +299,32 @@ const DashboardOverviewScreen: React.FC<{ user: User; onConnectAnother: () => vo
     onConnectAnother,
     isLoading,
 }) => {
-    if (isLoading) {
+    const userId = user?.id || "default-user";
+    const { transactions: apiTransactions, isLoading: isLoadingTransactions } = useTransactions(userId);
+
+    // Convert API transactions to UI format
+    const transactions: Transaction[] = useMemo(() => {
+        return apiTransactions.map((apiTx) => {
+            const categoryIcon = AVAILABLE_CATEGORY_ICONS.find(
+                (cat) => cat.name.toLowerCase() === apiTx.category?.toLowerCase()
+            )?.component || SwapIcon;
+            
+            return {
+                id: apiTx.$id,
+                description: apiTx.description || apiTx.merchant || 'Transaction',
+                amount: apiTx.type === 'income' ? Math.abs(apiTx.amount) : -Math.abs(apiTx.amount),
+                date: apiTx.date,
+                bankName: apiTx.accountId || 'Manual Entry',
+                category: apiTx.category || 'Uncategorized',
+                type: apiTx.source === 'manual' ? 'credit' : 
+                      apiTx.type === 'income' ? 'credit' : 'debit',
+                icon: categoryIcon,
+                notes: apiTx.description || '',
+            };
+        });
+    }, [apiTransactions]);
+
+    if (isLoading || isLoadingTransactions) {
         return <DashboardOverviewSkeleton />;
     }
 
@@ -361,9 +388,15 @@ const DashboardOverviewScreen: React.FC<{ user: User; onConnectAnother: () => vo
                         </Button>
                     </div>
                     <ul className="divide-y divide-outline">
-                        {MOCK_TRANSACTIONS.slice(0, 5).map((tx) => (
-                            <TransactionItem key={tx.id} transaction={tx} />
-                        ))}
+                        {transactions.length > 0 ? (
+                            transactions.slice(0, 5).map((tx) => (
+                                <TransactionItem key={tx.id} transaction={tx} />
+                            ))
+                        ) : (
+                            <li className="py-8 text-center text-on-surface-variant">
+                                No transactions yet. Add your first transaction to get started!
+                            </li>
+                        )}
                     </ul>
                 </Card>
             </main>

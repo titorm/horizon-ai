@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { MOCK_TRANSACTIONS, AVAILABLE_CATEGORY_ICONS } from "../constants";
+import React, { useMemo, useState, useEffect } from "react";
+import { AVAILABLE_CATEGORY_ICONS } from "../constants";
 import type { Transaction, TransactionType } from "../types";
 import { SearchIcon, FilterIcon, SwapIcon, PlusIcon, XIcon } from "../assets/Icons";
 import Input from "../components/ui/Input";
@@ -7,6 +7,7 @@ import Skeleton from "../components/ui/Skeleton";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import Modal from "../components/ui/Modal";
+import { useTransactions, createTransaction } from "../hooks/useTransactions";
 
 const TransactionItemSkeleton: React.FC = () => (
     <li className="flex items-center py-4 px-2">
@@ -133,8 +134,16 @@ const ActiveFilterTag: React.FC<{ label: string; onRemove: () => void }> = ({ la
 const TransactionsScreen: React.FC<{
     isLoading: boolean;
     onShowToast: (message: string, type: "success" | "error") => void;
-}> = ({ isLoading, onShowToast }) => {
-    const [transactions, setTransactions] = useState<Transaction[]>(MOCK_TRANSACTIONS);
+    userId?: string;
+}> = ({ isLoading: parentIsLoading, onShowToast, userId = "default-user" }) => {
+    // Fetch transactions from API
+    const { 
+        transactions: apiTransactions, 
+        isLoading: isLoadingTransactions, 
+        error: transactionsError,
+        refetch 
+    } = useTransactions(userId);
+    
     const [searchTerm, setSearchTerm] = useState("");
     const [showFilters, setShowFilters] = useState(false);
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
@@ -159,6 +168,36 @@ const TransactionsScreen: React.FC<{
         minAmount: "",
         maxAmount: "",
     });
+
+    // Convert API transactions to UI format
+    const transactions: Transaction[] = useMemo(() => {
+        return apiTransactions.map((apiTx) => {
+            // Map API type to UI TransactionType
+            const mapTransactionType = (type: string, source?: string): TransactionType => {
+                if (source === 'integration' || source === 'import') {
+                    return 'pix'; // or determine based on integration_data
+                }
+                return 'credit'; // default
+            };
+
+            // Get icon for category
+            const categoryIcon = AVAILABLE_CATEGORY_ICONS.find(
+                (c) => c.name.toLowerCase() === (apiTx.category || '').toLowerCase()
+            )?.component || SwapIcon;
+
+            return {
+                id: apiTx.$id,
+                description: apiTx.description || apiTx.merchant || 'Transaction',
+                amount: apiTx.type === 'income' ? Math.abs(apiTx.amount) : -Math.abs(apiTx.amount),
+                date: apiTx.date,
+                bankName: apiTx.accountId || 'Manual Entry',
+                category: apiTx.category || 'Uncategorized',
+                type: mapTransactionType(apiTx.type, apiTx.source),
+                icon: categoryIcon,
+                notes: apiTx.description,
+            };
+        });
+    }, [apiTransactions]);
 
     const allCategories = useMemo(() => [...new Set(transactions.map((tx) => tx.category))], [transactions]);
     const allAccounts = useMemo(() => [...new Set(transactions.map((tx) => tx.bankName))], [transactions]);
@@ -215,31 +254,45 @@ const TransactionsScreen: React.FC<{
         setIsAddModalOpen(true);
     };
 
-    const handleAddNewTransaction = (e: React.FormEvent) => {
+    const handleAddNewTransaction = async (e: React.FormEvent) => {
         e.preventDefault();
-        const categoryIcon =
-            AVAILABLE_CATEGORY_ICONS.find((c) => c.name === newTransaction.category)?.component || SwapIcon;
+        
+        try {
+            const finalAmount = Math.abs(newTransaction.amount);
+            const transactionType = newTransaction.flow === "expense" ? "expense" : "income";
 
-        const finalAmount =
-            newTransaction.flow === "expense" ? -Math.abs(newTransaction.amount) : Math.abs(newTransaction.amount);
+            await createTransaction({
+                userId,
+                amount: finalAmount,
+                type: transactionType as 'income' | 'expense',
+                category: newTransaction.category,
+                description: newTransaction.description,
+                date: new Date(newTransaction.date).toISOString(),
+                currency: 'BRL',
+                merchant: newTransaction.bankName,
+                tags: newTransaction.notes ? [newTransaction.notes] : undefined,
+            });
 
-        const newTx: Transaction = {
-            id: `manual-${Date.now()}`,
-            description: newTransaction.description,
-            amount: finalAmount,
-            date: new Date(newTransaction.date).toISOString(),
-            bankName: newTransaction.bankName,
-            category: newTransaction.category,
-            type: newTransaction.type,
-            notes: newTransaction.notes,
-            icon: categoryIcon,
-        };
-        setTransactions((prev) => [newTx, ...prev]);
-        setIsAddModalOpen(false);
-        onShowToast("Transaction added successfully!", "success");
+            // Refetch transactions to update the list
+            await refetch();
+            
+            setIsAddModalOpen(false);
+            onShowToast("Transaction added successfully!", "success");
+        } catch (error) {
+            console.error('Error creating transaction:', error);
+            onShowToast("Failed to add transaction. Please try again.", "error");
+        }
     };
 
-    if (isLoading) {
+    // Show error message if transactions failed to load
+    // MUST be before any conditional returns (React Rules of Hooks)
+    useEffect(() => {
+        if (transactionsError) {
+            onShowToast(`Error loading transactions: ${transactionsError}`, "error");
+        }
+    }, [transactionsError, onShowToast]);
+
+    if (isLoadingTransactions || parentIsLoading) {
         return <TransactionsScreenSkeleton />;
     }
 
@@ -249,10 +302,20 @@ const TransactionsScreen: React.FC<{
     return (
         <>
             <header className="mb-8">
-                <h1 className="text-4xl font-light text-on-surface">All Transactions</h1>
-                <p className="text-base text-on-surface-variant mt-1">
-                    Search and filter your complete transaction history.
-                </p>
+                <div className="flex justify-between items-start mb-2">
+                    <div>
+                        <h1 className="text-4xl font-light text-on-surface">All Transactions</h1>
+                        <p className="text-base text-on-surface-variant mt-1">
+                            Search and filter your complete transaction history.
+                        </p>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-sm font-medium text-on-surface-variant">Filtered Total</p>
+                        <p className={`text-3xl font-medium ${totalSum >= 0 ? "text-secondary" : "text-error"}`}>
+                            {totalSum.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                        </p>
+                    </div>
+                </div>
                 <div className="mt-6 flex items-center gap-4">
                     <div className="flex-grow max-w-sm">
                         <Input
@@ -432,13 +495,6 @@ const TransactionsScreen: React.FC<{
                     </div>
                 )}
             </main>
-
-            <footer className="mt-8 p-4 bg-surface-container rounded-lg flex justify-between items-center sticky bottom-6 shadow-md border border-outline">
-                <p className="font-medium text-on-surface">Filtered Total:</p>
-                <p className={`text-2xl font-medium ${totalSum >= 0 ? "text-secondary" : "text-error"}`}>
-                    {totalSum.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                </p>
-            </footer>
 
             {/* Add Transaction Modal */}
             <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add New Transaction">

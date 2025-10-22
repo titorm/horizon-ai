@@ -16,6 +16,14 @@ export const apiEndpoints = {
     profile: `${API_URL}/users/profile`,
     update: `${API_URL}/users/profile`,
   },
+  transactions: {
+    list: `${API_URL}/transactions`,
+    create: `${API_URL}/transactions/manual`,
+    get: (id: string) => `${API_URL}/transactions/${id}`,
+    update: (id: string) => `${API_URL}/transactions/${id}`,
+    delete: (id: string) => `${API_URL}/transactions/${id}`,
+    stats: (userId: string) => `${API_URL}/transactions/stats/${userId}`,
+  },
   // Add more endpoints as needed
 };
 

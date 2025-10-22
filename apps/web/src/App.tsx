@@ -257,7 +257,7 @@ function App() {
                                 case "dashboard/accounts":
                                     return <AccountsScreen isLoading={isLoading} />;
                                 case "dashboard/transactions":
-                                    return <TransactionsScreen isLoading={isLoading} onShowToast={showToast} />;
+                                    return <TransactionsScreen isLoading={isLoading} onShowToast={showToast} userId={user?.id} />;
                                 case "dashboard/categories":
                                     return <CategoriesScreen />;
                                 case "dashboard/invoices":

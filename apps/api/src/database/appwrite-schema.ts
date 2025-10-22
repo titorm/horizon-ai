@@ -11,6 +11,7 @@ export const COLLECTIONS = {
   USER_PROFILES: 'user_profiles',
   USER_PREFERENCES: 'user_preferences',
   USER_SETTINGS: 'user_settings',
+  TRANSACTIONS: 'transactions',
 } as const;
 
 // Database ID - Configure no Appwrite Console
@@ -333,4 +334,75 @@ export interface UserSettings {
   privacy_settings: string; // JSON string
   created_at: string;
   updated_at: string;
+}
+
+// ============================================
+// Collection: transactions
+// ============================================
+export const transactionsSchema = {
+  collectionId: COLLECTIONS.TRANSACTIONS,
+  name: 'Transactions',
+  permissions: ['read("any")', 'write("any")'],
+  rowSecurity: true,
+  attributes: [
+    { key: 'user_id', type: 'string', size: 255, required: true, array: false },
+    { key: 'amount', type: 'float', required: true },
+    { key: 'type', type: 'enum', elements: ['income', 'expense', 'transfer'], required: true, array: false },
+    { key: 'date', type: 'datetime', required: true },
+    {
+      key: 'status',
+      type: 'enum',
+      elements: ['pending', 'completed', 'failed', 'cancelled'],
+      required: true,
+      array: false,
+    },
+    { key: 'data', type: 'string', size: 16000, required: false, array: false }, // JSON field for all other data
+    { key: 'created_at', type: 'datetime', required: true },
+    { key: 'updated_at', type: 'datetime', required: true },
+  ],
+  indexes: [
+    { key: 'idx_user_id', type: 'key', attributes: ['user_id'], orders: ['ASC'] },
+    { key: 'idx_date', type: 'key', attributes: ['date'], orders: ['DESC'] },
+    { key: 'idx_type', type: 'key', attributes: ['type'] },
+    { key: 'idx_status', type: 'key', attributes: ['status'] },
+  ],
+};
+
+export interface Transaction {
+  $id: string;
+  $createdAt: string;
+  $updatedAt: string;
+  user_id: string;
+  amount: number;
+  type: 'income' | 'expense' | 'transfer';
+  date: string;
+  status: 'pending' | 'completed' | 'failed' | 'cancelled';
+  data?: string; // JSON string containing all other fields
+  created_at: string;
+  updated_at: string;
+}
+
+// Data structure stored in the data JSON field
+export interface TransactionData {
+  category: string;
+  description?: string;
+  currency: string;
+  source: 'manual' | 'integration' | 'import';
+  account_id?: string;
+  merchant?: string;
+  integration_id?: string;
+  integration_data?: any;
+  tags?: string[];
+  location?: {
+    latitude?: number;
+    longitude?: number;
+    address?: string;
+  };
+  receipt_url?: string;
+  is_recurring?: boolean;
+  recurring_pattern?: {
+    frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
+    interval: number;
+    endDate?: string;
+  };
 }

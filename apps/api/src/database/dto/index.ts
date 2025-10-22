@@ -321,3 +321,268 @@ export class UpdateSettingsDto {
   @IsOptional()
   customSettings?: Record<string, any>;
 }
+
+// ============================================
+// Transaction DTOs
+// ============================================
+
+export class CreateTransactionDto {
+  @IsString()
+  userId!: string;
+
+  @IsInt()
+  @Min(0)
+  amount!: number;
+
+  @IsEnum(['income', 'expense', 'transfer'])
+  type!: 'income' | 'expense' | 'transfer';
+
+  @IsString()
+  category!: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsDateString()
+  date!: string;
+
+  @IsString()
+  @IsOptional()
+  accountId?: string;
+
+  @IsString()
+  @IsOptional()
+  merchant?: string;
+
+  @IsString()
+  currency!: string;
+
+  @IsEnum(['pending', 'completed', 'failed', 'cancelled'])
+  @IsOptional()
+  status?: 'pending' | 'completed' | 'failed' | 'cancelled';
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags?: string[];
+
+  @IsObject()
+  @IsOptional()
+  location?: {
+    latitude?: number;
+    longitude?: number;
+    address?: string;
+  };
+
+  @IsUrl()
+  @IsOptional()
+  receiptUrl?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isRecurring?: boolean;
+
+  @IsObject()
+  @IsOptional()
+  recurringPattern?: {
+    frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
+    interval: number;
+    endDate?: string;
+  };
+}
+
+export class CreateIntegrationTransactionDto {
+  @IsString()
+  userId!: string;
+
+  @IsInt()
+  @Min(0)
+  amount!: number;
+
+  @IsEnum(['income', 'expense', 'transfer'])
+  type!: 'income' | 'expense' | 'transfer';
+
+  @IsString()
+  category!: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsDateString()
+  date!: string;
+
+  @IsString()
+  @IsOptional()
+  accountId?: string;
+
+  @IsString()
+  @IsOptional()
+  merchant?: string;
+
+  @IsString()
+  currency!: string;
+
+  @IsEnum(['pending', 'completed', 'failed', 'cancelled'])
+  @IsOptional()
+  status?: 'pending' | 'completed' | 'failed' | 'cancelled';
+
+  @IsString()
+  integrationId!: string;
+
+  @IsObject()
+  @IsOptional()
+  integrationData?: Record<string, any>;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags?: string[];
+
+  @IsObject()
+  @IsOptional()
+  location?: {
+    latitude?: number;
+    longitude?: number;
+    address?: string;
+  };
+
+  @IsUrl()
+  @IsOptional()
+  receiptUrl?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isRecurring?: boolean;
+
+  @IsObject()
+  @IsOptional()
+  recurringPattern?: {
+    frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
+    interval: number;
+    endDate?: string;
+  };
+}
+
+export class UpdateTransactionDto {
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  amount?: number;
+
+  @IsEnum(['income', 'expense', 'transfer'])
+  @IsOptional()
+  type?: 'income' | 'expense' | 'transfer';
+
+  @IsString()
+  @IsOptional()
+  category?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsDateString()
+  @IsOptional()
+  date?: string;
+
+  @IsString()
+  @IsOptional()
+  accountId?: string;
+
+  @IsString()
+  @IsOptional()
+  merchant?: string;
+
+  @IsString()
+  @IsOptional()
+  currency?: string;
+
+  @IsEnum(['pending', 'completed', 'failed', 'cancelled'])
+  @IsOptional()
+  status?: 'pending' | 'completed' | 'failed' | 'cancelled';
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags?: string[];
+
+  @IsObject()
+  @IsOptional()
+  location?: {
+    latitude?: number;
+    longitude?: number;
+    address?: string;
+  };
+
+  @IsUrl()
+  @IsOptional()
+  receiptUrl?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isRecurring?: boolean;
+
+  @IsObject()
+  @IsOptional()
+  recurringPattern?: {
+    frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
+    interval: number;
+    endDate?: string;
+  };
+}
+
+export class TransactionFilterDto {
+  @IsString()
+  @IsOptional()
+  userId?: string;
+
+  @IsEnum(['income', 'expense', 'transfer'])
+  @IsOptional()
+  type?: 'income' | 'expense' | 'transfer';
+
+  @IsString()
+  @IsOptional()
+  category?: string;
+
+  @IsEnum(['pending', 'completed', 'failed', 'cancelled'])
+  @IsOptional()
+  status?: 'pending' | 'completed' | 'failed' | 'cancelled';
+
+  @IsEnum(['manual', 'integration', 'import'])
+  @IsOptional()
+  source?: 'manual' | 'integration' | 'import';
+
+  @IsDateString()
+  @IsOptional()
+  startDate?: string;
+
+  @IsDateString()
+  @IsOptional()
+  endDate?: string;
+
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  minAmount?: number;
+
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  maxAmount?: number;
+
+  @IsString()
+  @IsOptional()
+  search?: string;
+
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  limit?: number;
+
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  offset?: number;
+}

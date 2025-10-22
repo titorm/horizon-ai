@@ -75,8 +75,10 @@ export interface Invoice {
 export type UserRole = 'FREE' | 'PREMIUM';
 
 export interface User {
+  id?: string;
   name: string;
   role: UserRole;
+  email?: string;
 }
 
 
