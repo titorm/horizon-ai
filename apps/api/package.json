@@ -14,19 +14,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "gen:name": "/Users/titorm/Documents/horizon-ai/apps/api/scripts/generate-name.sh 5 \"_\"",
-    "db:generate": "bash scripts/db-command.sh generate",
-    "db:migrate": "bash scripts/db-command.sh migrate",
-    "db:push": "bash scripts/db-command.sh push",
-    "db:studio": "bash scripts/db-command.sh studio",
-    "db:drop": "bash scripts/db-command.sh drop",
-    "migrate": "ts-node scripts/migrate.ts",
-    "migrate:generate": "ts-node scripts/migrate.ts generate",
-    "migrate:push": "ts-node scripts/migrate.ts push",
-    "migrate:migrate": "ts-node src/database/migrate.ts migrate",
-    "migrate:studio": "ts-node scripts/migrate.ts studio",
-    "migrate:status": "ts-node scripts/migrate.ts status",
-    "migrate:reset": "ts-node scripts/migrate.ts reset"
+    "gen:name": "/Users/titorm/Documents/horizon-ai/apps/api/scripts/generate-name.sh 5 \"_\""
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",

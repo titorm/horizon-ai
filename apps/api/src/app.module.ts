@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { HealthModule } from './health/health.module';
 import { AppwriteModule } from './appwrite/appwrite.module';
+import { UserModule } from './users/user.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AppwriteModule } from './appwrite/appwrite.module';
     AppwriteModule,
     AuthModule,
     HealthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

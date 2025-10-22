@@ -1,58 +1,51 @@
 # Horizon AI - API
 
-Serviço de API backend para a plataforma Horizon AI, construído com NestJS e Drizzle ORM.
+Serviço de API backend para a plataforma Horizon AI, construído com NestJS e Appwrite.
 
 ## Características
 
 - ✅ Autenticação com JWT (sem dependência de terceiros para auth)
 - ✅ Gerenciamento de sessão com Cookies HTTP-only
 - ✅ Validação de dados com class-validator
-- ✅ Drizzle ORM com PostgreSQL para persistência type-safe
-- ✅ Migrations automáticas com Drizzle Kit
+- ✅ Appwrite Database para persistência de dados
+- ✅ Integração completa com Appwrite SDK
 - ✅ CORS configurável
 - ✅ Testes com Jest
 - ✅ TypeScript strict mode
 
 ## Quick Start
 
-### 1. Configurar Banco de Dados
+### 1. Configurar Appwrite Database
 
-Você pode usar **PostgreSQL local** ou **Supabase** (PostgreSQL em nuvem).
+Siga o guia completo em [`APPWRITE-DATABASE-SETUP.md`](./APPWRITE-DATABASE-SETUP.md) para:
 
-#### Opção A: PostgreSQL Local com Docker
+- Criar projeto no Appwrite Cloud ou instalar self-hosted
+- Criar as 4 collections necessárias (users, profiles, preferences, settings)
+- Configurar índices e atributos
+- Obter as credenciais de API
 
-```bash
-# Iniciar PostgreSQL em container
-docker run --name horizon-ai-db \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=horizon_ai \
-  -p 5432:5432 \
-  -d postgres:15
-
-# Verificar se está rodando
-docker ps | grep horizon-ai-db
-```
-
-#### Opção B: PostgreSQL Local (sem Docker)
+#### Resumo Rápido
 
 ```bash
-# macOS com Homebrew
-brew install postgresql@15
-brew services start postgresql@15
+# 1. Criar conta no Appwrite Cloud
+# Acesse: https://cloud.appwrite.io/
 
-# Criar banco de dados
-createdb horizon_ai
+# 2. Criar novo projeto
+# Dashboard > Create Project > "Horizon AI"
 
-# Conectar
-psql horizon_ai
+# 3. Criar Database
+# Databases > Create Database > "production"
+
+# 4. Executar script de setup
+chmod +x scripts/setup-appwrite-db.sh
+./scripts/setup-appwrite-db.sh
 ```
 
-#### Opção C: Supabase (PostgreSQL em nuvem)
+Para instruções detalhadas, consulte:
 
-1. Criar conta em [supabase.com](https://supabase.com)
-2. Criar novo projeto
-3. Copiar `DATABASE_URL` da configuração
+- **Setup completo**: [`APPWRITE-DATABASE-SETUP.md`](./APPWRITE-DATABASE-SETUP.md)
+- **Guia de migração**: [`APPWRITE-MIGRATION.md`](./APPWRITE-MIGRATION.md)
+- **Quick start**: [`APPWRITE-QUICKSTART.md`](./APPWRITE-QUICKSTART.md)
 
 ### 2. Configurar Variáveis de Ambiente
 
@@ -61,21 +54,17 @@ psql horizon_ai
 cp .env.example .env.local
 
 # Editar .env.local (na raiz do monorepo!)
-# Exemplo para PostgreSQL local:
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/horizon_ai
-
-# Ou para Supabase:
-# DATABASE_URL=postgresql://postgres:password@db.project.supabase.co:5432/postgres
+APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+APPWRITE_PROJECT_ID=seu-project-id-aqui
+APPWRITE_API_KEY=sua-api-key-aqui
+APPWRITE_DATABASE_ID=production
 ```
 
-### 3. Executar Migrations
+### 3. Instalar Dependências
 
 ```bash
-# Aplicar todas as migrations ao banco
-pnpm db:push
-
-# Ou abrir UI visual do Drizzle
-pnpm db:studio
+cd apps/api
+pnpm install
 ```
 
 ### 4. Instalar dependências e rodar
@@ -90,35 +79,16 @@ pnpm -F @horizon-ai/api dev
 
 ## Desenvolvimento
 
-### Comandos do Banco de Dados
+### 4. Desenvolvimento da API
 
 ```bash
-# Gerar nova migration baseada em mudanças do schema.ts
-pnpm db:generate
-
-# Aplicar migrations ao banco de dados
-pnpm db:push
-
-# Executar migrations (alternativa)
-pnpm db:migrate
-
-# Abrir Drizzle Studio (UI visual para explorar dados)
-pnpm db:studio
-
-# Deletar todas as tabelas (CUIDADO!)
-pnpm db:drop
-```
-
-### Desenvolvimento da API
-
-```bash
-# Start dev server (port 8811)
+# Iniciar servidor de desenvolvimento (porta 8811)
 pnpm -F @horizon-ai/api dev
 
-# Run tests
+# Executar testes
 pnpm -F @horizon-ai/api test
 
-# Run tests with coverage
+# Executar testes com cobertura
 pnpm -F @horizon-ai/api test:cov
 
 # Lint
@@ -131,104 +101,114 @@ pnpm -F @horizon-ai/api format
 pnpm -F @horizon-ai/api typecheck
 ```
 
-## Drizzle ORM & Migrations
+## Estrutura do Banco de Dados Appwrite
 
-### Estrutura
+### Collections Criadas
+
+1. **users** - Dados básicos do usuário
+   - email, name, created_at, updated_at
+
+2. **user_profiles** - Perfil completo do usuário
+   - bio, avatar_url, phone, address, birth_date, etc.
+
+3. **user_preferences** - Preferências do usuário
+   - theme, language, notifications, timezone, etc.
+
+4. **user_settings** - Configurações da conta
+   - privacy, security, integrations, etc.
+
+Para detalhes completos da estrutura:
+
+- Schema TypeScript: [`src/database/appwrite-schema.ts`](./src/database/appwrite-schema.ts)
+- Documentação: [`APPWRITE-DATABASE-SETUP.md`](./APPWRITE-DATABASE-SETUP.md)
+
+### Estrutura de Arquivos
 
 ```text
 apps/api/
 ├── src/database/
-│   ├── schema.ts           # Definição de tabelas
-│   ├── db.ts               # Instância Drizzle
-│   ├── database.module.ts  # Módulo NestJS
-│   └── migrations/         # SQL gerado automaticamente
-└── scripts/
-    └── db-command.sh       # Wrapper para db commands
-```
-
-### Fluxo de Trabalho: Adicionar Nova Tabela
-
-1. **Editar schema.ts**
-
-```typescript
-// apps/api/src/database/schema.ts
-import { pgTable, uuid, text, timestamp } from 'drizzle-orm/pg-core';
-
-export const posts = pgTable('posts', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  title: text('title').notNull(),
-  content: text('content'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-});
+│   ├── appwrite-schema.ts              # Definição de collections
+│   └── services/
+│       ├── appwrite-user.service.ts    # Service CRUD de usuários
+│       └── appwrite-user.service.module.ts  # Módulo NestJS
+├── src/users/
+│   ├── user.controller.ts              # REST API endpoints
+│   └── user.module.ts                  # Módulo do controller
+├── scripts/
+│   └── setup-appwrite-db.sh            # Script de setup automático
+├── APPWRITE-DATABASE-SETUP.md          # Guia completo de setup
+├── APPWRITE-MIGRATION.md               # Guia de migração
+└── APPWRITE-QUICKSTART.md              # Quick start
 ```
 
 1. **Gerar migration**
 
-```bash
-pnpm db:generate
-# Gera arquivo SQL em apps/api/src/database/migrations/
-```
+## Uso do Service Appwrite
 
-1. **Revisar arquivo SQL gerado**
-
-```bash
-# O arquivo será criado em apps/api/src/database/migrations/
-cat apps/api/src/database/migrations/0001_*.sql
-```
-
-1. **Aplicar migration ao banco**
-
-```bash
-pnpm db:push
-```
-
-1. **Usar em seus serviços**
+### Exemplos de Operações CRUD
 
 ```typescript
-import { db } from './database/db';
-import { posts } from './database/schema';
+import { AppwriteUserService } from './database/services/appwrite-user.service';
 
-// Query
-const allPosts = await db.select().from(posts);
-
-// Insert
-await db.insert(posts).values({
-  title: 'Hello World',
-  content: 'My first post',
+// Criar usuário
+const user = await appwriteUserService.createUser({
+  email: 'user@example.com',
+  name: 'John Doe',
 });
 
-// Update
-await db.update(posts).set({ title: 'Updated' }).where(eq(posts.id, id));
+// Criar perfil completo
+const profile = await appwriteUserService.createProfile(userId, {
+  bio: 'Developer',
+  phone: '+55 11 98765-4321',
+  address: {
+    street: 'Rua Example',
+    city: 'São Paulo',
+    state: 'SP',
+    country: 'Brasil',
+    zipCode: '01234-567',
+  },
+});
 
-// Delete
-await db.delete(posts).where(eq(posts.id, id));
+// Atualizar preferências
+const preferences = await appwriteUserService.updatePreferences(userId, {
+  theme: 'dark',
+  language: 'pt-BR',
+  notifications: {
+    email: true,
+    push: true,
+    sms: false,
+  },
+});
+
+// Buscar usuário completo
+const fullUser = await appwriteUserService.findUserById(userId);
 ```
 
 ### Troubleshooting
 
-#### ❌ "DATABASE_URL não configurada"
+#### ❌ "APPWRITE_PROJECT_ID não configurada"
 
 ```bash
 # Verificar se .env.local existe na RAIZ do monorepo
-cat ../../.env.local | grep DATABASE_URL
+cat ../../.env.local | grep APPWRITE
 ```
 
-#### ❌ "Erro ao conectar ao banco"
+#### ❌ "Erro ao conectar ao Appwrite"
+
+Verifique:
+
+1. Se o `APPWRITE_ENDPOINT` está correto
+2. Se o `APPWRITE_PROJECT_ID` está correto
+3. Se a `APPWRITE_API_KEY` tem permissões corretas
+4. Se o database e as collections foram criadas
+
+#### ❌ "Collection não encontrada"
+
+Execute o script de setup:
 
 ```bash
-# Testar conexão
-psql "$DATABASE_URL" -c "SELECT 1"
-
-# Ou com Docker
-docker ps | grep horizon-ai-db
-```
-
-#### ❌ "Migration não foi aplicada"
-
-```bash
-# Abrir Studio e verificar status
-pnpm db:studio
-# Acesse http://localhost:3000
+chmod +x scripts/setup-appwrite-db.sh
+./scripts/setup-appwrite-db.sh
 ```
 
 ## Build e Produção
@@ -242,6 +222,109 @@ pnpm start:prod
 ```
 
 ## API Endpoints
+
+### User Profile
+
+#### Get Profile
+
+```bash
+GET /users/:userId/profile
+
+Response: 200
+{
+  "id": "document-id",
+  "userId": "user-id",
+  "bio": "Developer",
+  "avatarUrl": "https://...",
+  "phone": "+55 11 98765-4321",
+  "address": { ... },
+  "birthDate": "1990-01-01"
+}
+```
+
+#### Update Profile
+
+```bash
+PATCH /users/:userId/profile
+Content-Type: application/json
+
+{
+  "bio": "Senior Developer",
+  "phone": "+55 11 91234-5678"
+}
+
+Response: 200
+{
+  "id": "document-id",
+  "userId": "user-id",
+  "bio": "Senior Developer",
+  ...
+}
+```
+
+### User Preferences
+
+#### Get Preferences
+
+```bash
+GET /users/:userId/preferences
+
+Response: 200
+{
+  "id": "document-id",
+  "userId": "user-id",
+  "theme": "dark",
+  "language": "pt-BR",
+  "notifications": { ... }
+}
+```
+
+#### Update Preferences
+
+```bash
+PATCH /users/:userId/preferences
+Content-Type: application/json
+
+{
+  "theme": "light",
+  "language": "en-US"
+}
+
+Response: 200
+{ ... }
+```
+
+### User Settings
+
+#### Get Settings
+
+```bash
+GET /users/:userId/settings
+
+Response: 200
+{
+  "id": "document-id",
+  "userId": "user-id",
+  "privacy": { ... },
+  "security": { ... }
+}
+```
+
+#### Update Settings
+
+```bash
+PATCH /users/:userId/settings
+Content-Type: application/json
+
+{
+  "privacy": {
+    "profileVisibility": "private"
+  }
+}
+
+Response: 200
+{ ... }
+```
 
 ### Autenticação
 
@@ -334,7 +417,7 @@ Response: 200
 
 ## Estrutura do Projeto
 
-```mermaid
+```text
 src/
 ├── auth/                 # Autenticação
 │   ├── dto/             # Data Transfer Objects
@@ -343,8 +426,14 @@ src/
 │   ├── auth.controller.ts
 │   ├── auth.service.ts
 │   └── auth.module.ts
-├── entities/            # Entidades de banco de dados
-│   └── user.entity.ts
+├── database/            # Database e schemas
+│   ├── appwrite-schema.ts
+│   └── services/
+│       ├── appwrite-user.service.ts
+│       └── appwrite-user.service.module.ts
+├── users/               # User endpoints
+│   ├── user.controller.ts
+│   └── user.module.ts
 ├── health/              # Health check
 │   ├── health.controller.ts
 │   └── health.module.ts
@@ -358,9 +447,21 @@ src/
 
 Veja `.env.example` para todas as variáveis disponíveis.
 
-- `PORT` - Porta do servidor (padrão: 3001)
+**Appwrite:**
+
+- `APPWRITE_ENDPOINT` - URL do Appwrite (ex: <https://cloud.appwrite.io/v1>)
+- `APPWRITE_PROJECT_ID` - ID do projeto no Appwrite
+- `APPWRITE_API_KEY` - API Key com permissões necessárias
+- `APPWRITE_DATABASE_ID` - ID do database (ex: production)
+
+**API:**
+
+- `PORT` - Porta do servidor (padrão: 8811)
 - `JWT_SECRET` - Chave secreta para JWT
 - `JWT_EXPIRATION` - Expiração do JWT (padrão: 7d)
+
+**Cookies:**
+
 - `COOKIE_MAX_AGE` - Tempo máximo do cookie em ms
 - `COOKIE_SECURE` - Usar cookies seguros (HTTPS)
 - `COOKIE_HTTP_ONLY` - Apenas HTTP (não acessível via JavaScript)
@@ -373,6 +474,7 @@ Veja `.env.example` para todas as variáveis disponíveis.
 - ✅ Cookies HTTP-only e secure
 - ✅ CORS configurável
 - ✅ Validação de entrada com class-validator
+- ✅ Appwrite Database com permissões granulares
 
 ## Licença
 
