@@ -5,11 +5,10 @@ import {
     MOCK_BALANCE,
     MOCK_MONTHLY_INCOME,
     MOCK_MONTHLY_EXPENSES,
-    MOCK_INSIGHTS,
     MOCK_CHART_DATA,
     AVAILABLE_CATEGORY_ICONS,
 } from "../constants";
-import type { Transaction, User, FinancialInsight, InsightType } from "../types";
+import type { Transaction, User, FinancialInsight, InsightType, Screen } from "../types";
 import {
     ArrowDownCircleIcon,
     ArrowUpCircleIcon,
@@ -21,6 +20,7 @@ import {
 } from "../assets/Icons";
 import Skeleton from "../components/ui/Skeleton";
 import { useTransactions } from "../hooks/useTransactions";
+import { useFinancialInsights } from "../hooks/useFinancialInsights";
 
 // --- BarChart Component Definition ---
 interface ChartData {
@@ -130,7 +130,10 @@ const BarChart: React.FC<{ data: ChartData[] }> = ({ data }) => {
 };
 // --- End of BarChart Component ---
 
-const FinancialInsightCard: React.FC<{ insight: FinancialInsight }> = ({ insight }) => {
+const FinancialInsightCard: React.FC<{ insight: FinancialInsight; onNavigateToTransactions: () => void }> = ({ 
+    insight, 
+    onNavigateToTransactions 
+}) => {
     const insightMeta: Record<InsightType, { icon: React.ReactNode; color: string }> = {
         SAVINGS_OPPORTUNITY: {
             icon: <LightbulbIcon className="w-6 h-6 text-tertiary" />,
@@ -155,7 +158,11 @@ const FinancialInsightCard: React.FC<{ insight: FinancialInsight }> = ({ insight
                 <div className="flex-grow">
                     <h4 className="font-medium text-on-surface">{insight.title}</h4>
                     <p className="text-sm text-on-surface-variant mt-1 mb-3">{insight.description}</p>
-                    <Button variant="text" className="!h-auto !p-0 text-sm">
+                    <Button 
+                        variant="text" 
+                        className="!h-auto !p-0 text-sm"
+                        onClick={onNavigateToTransactions}
+                    >
                         {insight.actionText}
                     </Button>
                 </div>
@@ -294,13 +301,28 @@ const TransactionItem: React.FC<{ transaction: Transaction }> = ({ transaction }
     );
 };
 
-const DashboardOverviewScreen: React.FC<{ user: User; onConnectAnother: () => void; isLoading: boolean }> = ({
+const DashboardOverviewScreen: React.FC<{ 
+    user: User; 
+    onConnectAnother: () => void; 
+    isLoading: boolean;
+    onNavigate?: (screen: Screen) => void;
+}> = ({
     user,
     onConnectAnother,
     isLoading,
+    onNavigate,
 }) => {
     const userId = user?.id || "default-user";
     const { transactions: apiTransactions, isLoading: isLoadingTransactions } = useTransactions(userId);
+
+    // Generate AI insights based on real transaction data
+    const aiInsights = useFinancialInsights(apiTransactions);
+
+    const handleNavigateToTransactions = () => {
+        if (onNavigate) {
+            onNavigate("dashboard/transactions");
+        }
+    };
 
     // Convert API transactions to UI format
     const transactions: Transaction[] = useMemo(() => {
@@ -371,19 +393,25 @@ const DashboardOverviewScreen: React.FC<{ user: User; onConnectAnother: () => vo
                     <BarChart data={MOCK_CHART_DATA} />
                 </Card>
 
-                <div>
-                    <h3 className="text-xl font-medium text-on-surface mb-4">AI Insights</h3>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {MOCK_INSIGHTS.map((insight) => (
-                            <FinancialInsightCard key={insight.id} insight={insight} />
-                        ))}
+                {aiInsights.length > 0 && (
+                    <div>
+                        <h3 className="text-xl font-medium text-on-surface mb-4">AI Insights</h3>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {aiInsights.map((insight) => (
+                                <FinancialInsightCard 
+                                    key={insight.id} 
+                                    insight={insight} 
+                                    onNavigateToTransactions={handleNavigateToTransactions}
+                                />
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 <Card className="p-6">
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-xl font-medium text-on-surface">Recent Transactions</h3>
-                        <Button onClick={() => {}} variant="text">
+                        <Button onClick={handleNavigateToTransactions} variant="text">
                             View All
                         </Button>
                     </div>

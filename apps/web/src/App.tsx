@@ -252,6 +252,7 @@ function App() {
                                             user={user}
                                             onConnectAnother={handleConnectAnother}
                                             isLoading={isLoading}
+                                            onNavigate={setScreen}
                                         />
                                     );
                                 case "dashboard/accounts":
@@ -304,6 +305,7 @@ function App() {
                                             user={user}
                                             onConnectAnother={handleConnectAnother}
                                             isLoading={isLoading}
+                                            onNavigate={setScreen}
                                         />
                                     );
                             }
