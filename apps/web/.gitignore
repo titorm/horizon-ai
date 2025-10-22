@@ -1,0 +1,10 @@
+# Vite build output
+dist/
+*.local
+
+# Environment variables
+.env.local
+
+# Logs
+logs/
+npm-debug.log*

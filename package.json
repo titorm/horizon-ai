@@ -2,26 +2,59 @@
   "name": "horizon-ai",
   "private": true,
   "version": "0.0.1",
-  "type": "module",
+  "description": "Horizon AI - A comprehensive financial management platform",
+  "license": "MIT",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "@google/genai": "^1.25.0"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "preview": "turbo run preview",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\""
   },
   "devDependencies": {
-    "@types/node": "^24.9.0",
-    "@vitejs/plugin-react": "^5.0.4",
-    "typescript": "~5.9.3",
-    "vite": "^7.1.11"
+    "turbo": "^2.2.3",
+    "typescript": "~5.9.3"
   },
   "engines": {
     "node": ">=22",
     "pnpm": ">=9"
   },
-  "packageManager": "pnpm@10.17.1"
+  "packageManager": "pnpm@10.17.1",
+  "prettier": {
+    "bracketSameLine": false,
+    "importOrder": [
+      "<THIRD_PARTY_MODULES>",
+      "^@core/(.*)$",
+      "^@ui/(.*)$",
+      "^[./]"
+    ],
+    "importOrderParserPlugins": [
+      "typescript",
+      "decorators-legacy"
+    ],
+    "importOrderSeparation": true,
+    "importOrderSortSpecifiers": true,
+    "jsxSingleQuote": true,
+    "plugins": [
+      "@trivago/prettier-plugin-sort-imports"
+    ],
+    "printWidth": 120,
+    "singleAttributePerLine": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "all",
+    "overrides": [
+      {
+        "files": [
+          "*.tsx",
+          "*.ts"
+        ],
+        "options": {
+          "parser": "typescript"
+        }
+      }
+    ]
+  }
 }

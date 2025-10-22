@@ -1,0 +1,69 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "globalDependencies": [
+    ".env",
+    ".env.local",
+    "tsconfig.json"
+  ],
+  "globalEnv": [
+    "NODE_ENV",
+    "PORT",
+    "API_URL",
+    "DATABASE_URL",
+    "JWT_SECRET",
+    "JWT_EXPIRATION",
+    "JWT_REFRESH_SECRET",
+    "JWT_REFRESH_EXPIRATION",
+    "COOKIE_MAX_AGE",
+    "COOKIE_SECURE",
+    "COOKIE_HTTP_ONLY",
+    "COOKIE_SAME_SITE",
+    "CORS_ORIGIN",
+    "GEMINI_API_KEY"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**"
+      ],
+      "cache": true
+    },
+    "dev": {
+      "cache": false,
+      "interactive": true,
+      "persistent": true
+    },
+    "preview": {
+      "cache": false,
+      "interactive": true,
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "typecheck": {
+      "cache": true,
+      "outputs": []
+    },
+    "lint": {
+      "cache": true,
+      "outputs": []
+    },
+    "test": {
+      "cache": true,
+      "outputs": [
+        "coverage/**"
+      ],
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}
