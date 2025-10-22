@@ -1,6 +1,6 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { Databases, Query, ID, TablesDB } from 'node-appwrite';
-import { getAppwriteTables } from '@/appwrite/appwrite.client';
+import { getAppwriteTables } from '../../appwrite/appwrite.client';
 import { DATABASE_ID, COLLECTIONS, User, UserProfile, UserPreferences, UserSettings } from '../appwrite-schema';
 
 @Injectable()
@@ -302,7 +302,11 @@ export class AppwriteUserService {
     const now = new Date().toISOString();
 
     // Older schema stored many boolean fields; migrations consolidate into a single
-    // 'notifications' JSON column. Pack related fields into that JSON for compatibility.
+    // 'notifications' JSON column is kept for backward compatibility, but the
+    // runtime schema now includes discrete columns such as email_notifications,
+    // push_notifications, sms_notifications, notification_frequency and several
+    // other preference flags. Populate those explicitly to satisfy required
+    // column constraints.
     const notifications = {
       email_notifications: data.email_notifications ?? true,
       push_notifications: data.push_notifications ?? true,
@@ -310,12 +314,23 @@ export class AppwriteUserService {
       notification_frequency: data.notification_frequency || 'realtime',
     };
 
-    const payload = {
+    const payload: any = {
       user_id: data.user_id,
       theme: data.theme || 'system',
       language: data.language || 'pt-BR',
       currency: data.currency || 'BRL',
       timezone: data.timezone || 'UTC',
+      // New discrete columns added by sync migration
+      email_notifications: data.email_notifications ?? true,
+      push_notifications: data.push_notifications ?? true,
+      sms_notifications: data.sms_notifications ?? false,
+      notification_frequency: data.notification_frequency || 'realtime',
+      show_balances: data.show_balances ?? true,
+      auto_categorization_enabled: data.auto_categorization_enabled ?? true,
+      budget_alerts: data.budget_alerts ?? true,
+      profile_visibility: data.profile_visibility ?? 'private',
+      share_data_for_insights: data.share_data_for_insights ?? false,
+      // Keep legacy notifications JSON for compatibility
       notifications: this.stringifyJSON(notifications),
       created_at: now,
       updated_at: now,
@@ -379,6 +394,22 @@ export class AppwriteUserService {
       updateData.notifications = this.stringifyJSON(existingNotifications);
     }
 
+    // Map individual preference fields (if provided) to discrete columns added by migration
+    const maybeMap = (field: string, target?: string) => {
+      const key = target || field;
+      if (data[field] !== undefined) updateData[key] = data[field];
+    };
+
+    maybeMap('email_notifications');
+    maybeMap('push_notifications');
+    maybeMap('sms_notifications');
+    maybeMap('notification_frequency');
+    maybeMap('show_balances');
+    maybeMap('auto_categorization_enabled');
+    maybeMap('budget_alerts');
+    maybeMap('profile_visibility');
+    maybeMap('share_data_for_insights');
+
     let document: any;
     if (this.tables) {
       document = await this.tables.updateRow({
@@ -436,13 +467,20 @@ export class AppwriteUserService {
       custom_settings: data.custom_settings,
     };
 
-    const payload = {
+    const payload: any = {
       user_id: data.user_id,
       two_factor_enabled: data.two_factor_enabled ?? false,
       email_verified: data.email_verified ?? false,
       phone_verified: data.phone_verified ?? false,
       marketing_emails: data.marketing_emails ?? false,
       privacy_settings: this.stringifyJSON(privacy),
+      // Required columns added by sync migration - provide defaults to prevent "missing required attribute" errors
+      session_timeout: data.session_timeout ?? 30,
+      auto_sync_enabled: data.auto_sync_enabled ?? true,
+      sync_frequency: data.sync_frequency ?? 60,
+      cloud_backup_enabled: data.cloud_backup_enabled ?? false,
+      beta_features: data.beta_features ?? false,
+      analytics_opt_in: data.analytics_opt_in ?? false,
       created_at: now,
       updated_at: now,
     };

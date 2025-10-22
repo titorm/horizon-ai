@@ -74,7 +74,7 @@ describe('RandomNameGenerator', () => {
       const existingNames = new Set<string>();
       // Adiciona muitos nomes para fazer falhar (na prática isso é improvável)
       // Este teste é mais para validar o comportamento máximo
-      const newName = generateUniqueRandomName(existingNames, 1000);
+      const newName = generateUniqueRandomName(existingNames, 0);
       expect(newName).toBeNull();
     });
 

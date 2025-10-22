@@ -2,9 +2,9 @@ import { Injectable, ConflictException, UnauthorizedException, Logger } from '@n
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { SignUpDto, SignInDto, AuthResponseDto } from './dto';
-import { getAppwriteAccount, generateId } from '@/appwrite/appwrite.client';
-import { AppwriteException, ID } from 'node-appwrite';
-import { AppwriteUserService } from '@/database/services/appwrite-user.service';
+import { getAppwriteAccount, generateId } from '../appwrite/appwrite.client';
+import { AppwriteException } from 'node-appwrite';
+import { AppwriteUserService } from '../database/services/appwrite-user.service';
 
 interface AppwriteUser {
   $id: string;
