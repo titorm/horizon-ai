@@ -6,10 +6,12 @@ node_modules
 # Testing
 coverage
 *.log
+**/*.test.ts
+**/*.spec.ts
+tests/
 
-# Production (except web/dist)
-apps/api/dist
-apps/api/build
+# Production build artifacts (we build on Vercel)
+# Note: we need apps/api/dist for the serverless function
 
 # Misc
 .DS_Store
@@ -40,6 +42,16 @@ Thumbs.db
 # Backups
 backups/
 *.sql
+
+# Development scripts
+apps/api/scripts/
+start-dev.sh
+test-migration.sh
+
+# Config files not needed in production
+.eslintrc.js
+.prettierrc
+jest.config.js
 
 # Docs (optional - uncomment if you don't want to deploy docs)
 # docs/

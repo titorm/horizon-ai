@@ -71,3 +71,70 @@ const res = await apiFetch(apiEndpoints.auth.signIn, {
 ### Security
 
 ⚠️ **NUNCA** faça commit de `.env.local` com credenciais reais. O arquivo já está no `.gitignore`.
+
+## 🚀 Deploy para Produção (Vercel)
+
+A aplicação está configurada para deploy serverless no Vercel.
+
+### Quick Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftitorm%2Fhorizon-ai)
+
+### Manual Deploy
+
+1. **Instalar Vercel CLI**:
+   ```bash
+   pnpm install -g vercel
+   ```
+
+2. **Configurar variáveis de ambiente no Vercel**:
+   ```bash
+   vercel env add APPWRITE_ENDPOINT
+   vercel env add APPWRITE_PROJECT_ID
+   vercel env add APPWRITE_API_KEY
+   vercel env add JWT_SECRET
+   # ... outras variáveis
+   ```
+
+3. **Deploy de preview**:
+   ```bash
+   vercel
+   ```
+
+4. **Deploy de produção**:
+   ```bash
+   vercel --prod
+   ```
+
+### Deploy Automático via Git
+
+Push para a branch principal (`main` ou `feat/vercel`) para deploy automático:
+
+```bash
+git push origin main
+```
+
+### Documentação de Deploy
+
+- 📖 [Guia Completo de Deploy Serverless](docs/VERCEL-SERVERLESS-GUIDE.md)
+- ✅ [Checklist de Deploy](docs/DEPLOY-CHECKLIST.md)
+- 📊 [Resumo da Configuração](docs/SERVERLESS-SUMMARY.md)
+
+## 📁 Estrutura do Projeto
+
+```
+horizon-ai/
+├── api/                        # Serverless function entry point
+│   └── index.js               # Handler para Vercel
+├── apps/
+│   ├── api/                   # Backend NestJS
+│   │   ├── src/
+│   │   │   ├── serverless.ts  # Handler serverless
+│   │   │   └── main.ts        # Entry point tradicional (dev)
+│   │   └── vercel.json        # Config da API
+│   └── web/                   # Frontend React
+│       └── dist/              # Build estático
+├── docs/                      # Documentação
+├── packages/                  # Shared packages
+└── vercel.json               # Config principal Vercel
+```
