@@ -56,32 +56,32 @@
   - Definir rotas públicas e protegidas
   - _Requirements: 6.1, 6.4, 6.5_
 
-- [-] 8. Migrar services do NestJS para lib/services
-- [ ] 8.1 Migrar auth.service.ts
+- [x] 8. Migrar services do NestJS para lib/services
+- [x] 8.1 Migrar auth.service.ts
   - Criar lib/services/auth.service.ts com funções signIn, signUp, signOut
   - Migrar lógica de autenticação do NestJS AuthService
   - Integrar com Appwrite Account API
   - _Requirements: 3.1, 3.2, 3.3_
 
-- [ ] 8.2 Migrar user.service.ts
+- [x] 8.2 Migrar user.service.ts
   - Criar lib/services/user.service.ts
   - Migrar appwrite-user.service.ts do NestJS
   - Implementar funções de CRUD de usuários
   - _Requirements: 3.1, 3.2, 3.3_
 
-- [ ] 8.3 Migrar account.service.ts
+- [x] 8.3 Migrar account.service.ts
   - Criar lib/services/account.service.ts
   - Migrar appwrite-account.service.ts do NestJS
   - Implementar funções de CRUD de contas bancárias
   - _Requirements: 3.1, 3.2, 3.3_
 
-- [ ] 8.4 Migrar credit-card.service.ts
+- [x] 8.4 Migrar credit-card.service.ts
   - Criar lib/services/credit-card.service.ts
   - Migrar appwrite-credit-card.service.ts do NestJS
   - Implementar funções de CRUD de cartões de crédito
   - _Requirements: 3.1, 3.2, 3.3_
 
-- [ ] 8.5 Migrar transaction.service.ts
+- [x] 8.5 Migrar transaction.service.ts
   - Criar lib/services/transaction.service.ts
   - Migrar appwrite-transaction.service.ts do NestJS
   - Implementar funções de CRUD de transações e estatísticas
