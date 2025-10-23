@@ -114,7 +114,7 @@
   - Retornar dados do usuário autenticado
   - _Requirements: 3.1_
 
-- [ ] 10. Criar API Routes para usuários
+- [x] 10. Criar API Routes para usuários
   - Criar app/api/users/profile/route.ts com GET e PATCH handlers
   - Integrar com user.service.ts
   - Implementar validação de dados
