@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
 import {
     MOCK_BALANCE,
     AVAILABLE_CATEGORY_ICONS,
@@ -15,7 +15,7 @@ import {
     TrendingUpIcon,
     SwapIcon,
 } from "../assets/Icons";
-import Skeleton from "../components/ui/Skeleton";
+import Skeleton from "@/components/ui/Skeleton";
 import { useTransactions } from "../hooks/useTransactions";
 import { useFinancialInsights } from "../hooks/useFinancialInsights";
 import { useTotalBalance } from "../hooks/useTotalBalance";

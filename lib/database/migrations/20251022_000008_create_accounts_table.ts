@@ -33,7 +33,7 @@ export const migration: Migration = {
     console.log('Creating columns...');
 
     // Column 1: user_id - Reference to user
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: COLLECTIONS.ACCOUNTS,
       key: 'user_id',
@@ -42,7 +42,7 @@ export const migration: Migration = {
     });
 
     // Column 2: name - Account name
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: COLLECTIONS.ACCOUNTS,
       key: 'name',
@@ -51,7 +51,7 @@ export const migration: Migration = {
     });
 
     // Column 3: account_type - checking, savings, investment, other
-    await databases.createEnumColumn({
+    await createEnumColumn({
       databaseId,
       collectionId: COLLECTIONS.ACCOUNTS,
       key: 'account_type',
@@ -60,7 +60,7 @@ export const migration: Migration = {
     });
 
     // Column 4: balance - Current balance
-    await databases.createFloatColumn({
+    await createFloatColumn({
       databaseId,
       collectionId: COLLECTIONS.ACCOUNTS,
       key: 'balance',
@@ -68,7 +68,7 @@ export const migration: Migration = {
     });
 
     // Column 5: is_manual - Whether this is a manual account
-    await databases.createBooleanColumn({
+    await createBooleanColumn({
       databaseId,
       collectionId: COLLECTIONS.ACCOUNTS,
       key: 'is_manual',
@@ -76,7 +76,7 @@ export const migration: Migration = {
     });
 
     // Column 6: data - JSON string for bank_id, last_digits, status, etc.
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: COLLECTIONS.ACCOUNTS,
       key: 'data',
@@ -85,7 +85,7 @@ export const migration: Migration = {
     });
 
     // Column 7: created_at
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: COLLECTIONS.ACCOUNTS,
       key: 'created_at',
@@ -93,7 +93,7 @@ export const migration: Migration = {
     });
 
     // Column 8: updated_at
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: COLLECTIONS.ACCOUNTS,
       key: 'updated_at',
@@ -103,7 +103,7 @@ export const migration: Migration = {
     console.log('Creating indexes...');
 
     // Index 1: user_id for user queries
-    await databases.createIndex({
+    await createIndex({
       databaseId,
       collectionId: COLLECTIONS.ACCOUNTS,
       key: 'idx_user_id',
@@ -113,7 +113,7 @@ export const migration: Migration = {
     });
 
     // Index 2: is_manual for filtering manual vs integrated accounts
-    await databases.createIndex({
+    await createIndex({
       databaseId,
       collectionId: COLLECTIONS.ACCOUNTS,
       key: 'idx_is_manual',

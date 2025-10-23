@@ -540,7 +540,7 @@ export const MOCK_INSURANCE_POLICIES: InsurancePolicy[] = [
 export const MOCK_FINANCIAL_GOALS: FinancialGoal[] = [
   { $id: '1', name: 'Buy a house', targetAmount: 600000, currentAmount: 150000, targetDate: 'Dec 2027' },
   { $id: '2', name: 'Vacation', targetAmount: 30000, currentAmount: 28000, targetDate: 'Jun 2025' },
-  { $id: '3', name: "Kids' Education", targetAmount: 200000, currentAmount: 45000, targetDate: 'Aug 2028' },
+  { $id: '3', name: "Kids' Education", targetAmount: 200000, currentAmount: 45000, targetDate: "Aug 2028" },
 ];
 
 export const MOCK_FAMILY_MEMBERS: FamilyMember[] = [

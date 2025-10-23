@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import Badge from "../components/ui/Badge";
-import Modal from "../components/ui/Modal";
-import Input from "../components/ui/Input";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import Badge from "@/components/ui/Badge";
+import Modal from "@/components/ui/Modal";
+import Input from "@/components/ui/Input";
 import { MOCK_BENEFICIARIES } from "../constants";
 import type { Beneficiary } from "../types";
 import { UsersIcon, PlusIcon, EditIcon, Trash2Icon } from "../assets/Icons";

@@ -27,7 +27,7 @@ export const migration: Migration = {
     console.log('Creating columns...');
 
     // Create migrationId column (string, required, unique)
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: 'migrations',
       key: 'migrationId',
@@ -36,7 +36,7 @@ export const migration: Migration = {
     });
 
     // Create description column (string, required)
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: 'migrations',
       key: 'description',
@@ -45,7 +45,7 @@ export const migration: Migration = {
     });
 
     // Create appliedAt column (datetime, required)
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: 'migrations',
       key: 'appliedAt',
@@ -55,7 +55,7 @@ export const migration: Migration = {
     console.log('Creating indexes...');
 
     // Create unique index on migrationId
-    await databases.createIndex({
+    await createIndex({
       databaseId,
       collectionId: 'migrations',
       key: 'migrationId_unique',
@@ -64,7 +64,7 @@ export const migration: Migration = {
     });
 
     // Create index on appliedAt for chronological queries
-    await databases.createIndex({
+    await createIndex({
       databaseId,
       collectionId: 'migrations',
       key: 'appliedAt_index',

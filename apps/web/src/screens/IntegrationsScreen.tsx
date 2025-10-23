@@ -1,6 +1,6 @@
 import React from "react";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
 import { MOCK_INTEGRATIONS } from "../constants";
 import type { Integration, IntegrationCategory } from "../types";
 import { CheckIcon } from "../assets/Icons";

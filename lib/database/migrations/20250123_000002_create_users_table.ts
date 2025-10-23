@@ -26,7 +26,7 @@ export const migration: Migration = {
     console.log('Creating columns...');
 
     // auth_user_id - Reference to Appwrite Auth user
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: 'users',
       key: 'auth_user_id',
@@ -43,7 +43,7 @@ export const migration: Migration = {
     });
 
     // name
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: 'users',
       key: 'name',
@@ -52,7 +52,7 @@ export const migration: Migration = {
     });
 
     // created_at
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: 'users',
       key: 'created_at',
@@ -60,7 +60,7 @@ export const migration: Migration = {
     });
 
     // updated_at
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: 'users',
       key: 'updated_at',
@@ -70,7 +70,7 @@ export const migration: Migration = {
     console.log('Creating indexes...');
 
     // Create unique index on auth_user_id
-    await databases.createIndex({
+    await createIndex({
       databaseId,
       collectionId: 'users',
       key: 'idx_auth_user_id',
@@ -79,7 +79,7 @@ export const migration: Migration = {
     });
 
     // Create index on email
-    await databases.createIndex({
+    await createIndex({
       databaseId,
       collectionId: 'users',
       key: 'idx_email',

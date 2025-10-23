@@ -33,7 +33,7 @@ export const migration: Migration = {
     console.log('Creating columns...');
 
     // Column 1: account_id - Reference to account
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: COLLECTIONS.CREDIT_CARDS,
       key: 'account_id',
@@ -42,7 +42,7 @@ export const migration: Migration = {
     });
 
     // Column 2: name - Card name
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: COLLECTIONS.CREDIT_CARDS,
       key: 'name',
@@ -51,7 +51,7 @@ export const migration: Migration = {
     });
 
     // Column 3: last_digits - Last 4 digits
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: COLLECTIONS.CREDIT_CARDS,
       key: 'last_digits',
@@ -60,7 +60,7 @@ export const migration: Migration = {
     });
 
     // Column 4: credit_limit - Total credit limit
-    await databases.createFloatColumn({
+    await createFloatColumn({
       databaseId,
       collectionId: COLLECTIONS.CREDIT_CARDS,
       key: 'credit_limit',
@@ -68,7 +68,7 @@ export const migration: Migration = {
     });
 
     // Column 5: used_limit - Used credit amount
-    await databases.createFloatColumn({
+    await createFloatColumn({
       databaseId,
       collectionId: COLLECTIONS.CREDIT_CARDS,
       key: 'used_limit',
@@ -76,7 +76,7 @@ export const migration: Migration = {
     });
 
     // Column 6: closing_day - Day of month for closing (1-31)
-    await databases.createIntegerColumn({
+    await createIntegerColumn({
       databaseId,
       collectionId: COLLECTIONS.CREDIT_CARDS,
       key: 'closing_day',
@@ -84,7 +84,7 @@ export const migration: Migration = {
     });
 
     // Column 7: due_day - Day of month for payment due (1-31)
-    await databases.createIntegerColumn({
+    await createIntegerColumn({
       databaseId,
       collectionId: COLLECTIONS.CREDIT_CARDS,
       key: 'due_day',
@@ -92,7 +92,7 @@ export const migration: Migration = {
     });
 
     // Column 8: data - JSON string for brand, network, color, etc.
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: COLLECTIONS.CREDIT_CARDS,
       key: 'data',
@@ -101,7 +101,7 @@ export const migration: Migration = {
     });
 
     // Column 9: created_at
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: COLLECTIONS.CREDIT_CARDS,
       key: 'created_at',
@@ -109,7 +109,7 @@ export const migration: Migration = {
     });
 
     // Column 10: updated_at
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: COLLECTIONS.CREDIT_CARDS,
       key: 'updated_at',
@@ -119,7 +119,7 @@ export const migration: Migration = {
     console.log('Creating indexes...');
 
     // Index 1: account_id for account queries
-    await databases.createIndex({
+    await createIndex({
       databaseId,
       collectionId: COLLECTIONS.CREDIT_CARDS,
       key: 'idx_account_id',

@@ -26,7 +26,7 @@ export const migration: Migration = {
     console.log('Creating columns...');
 
     // user_id - Foreign key to users table
-    // await databases.createStringColumn({
+    // await createStringColumn({
     //   databaseId,
     //   collectionId: 'user_settings',
     //   key: 'user_id',
@@ -35,7 +35,7 @@ export const migration: Migration = {
     // });
 
     // two_factor_enabled
-    await databases.createBooleanColumn({
+    await createBooleanColumn({
       databaseId,
       collectionId: 'user_settings',
       key: 'two_factor_enabled',
@@ -43,7 +43,7 @@ export const migration: Migration = {
     });
 
     // email_verified
-    await databases.createBooleanColumn({
+    await createBooleanColumn({
       databaseId,
       collectionId: 'user_settings',
       key: 'email_verified',
@@ -51,7 +51,7 @@ export const migration: Migration = {
     });
 
     // phone_verified
-    await databases.createBooleanColumn({
+    await createBooleanColumn({
       databaseId,
       collectionId: 'user_settings',
       key: 'phone_verified',
@@ -59,7 +59,7 @@ export const migration: Migration = {
     });
 
     // marketing_emails
-    await databases.createBooleanColumn({
+    await createBooleanColumn({
       databaseId,
       collectionId: 'user_settings',
       key: 'marketing_emails',
@@ -67,7 +67,7 @@ export const migration: Migration = {
     });
 
     // privacy_settings - JSON string
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: 'user_settings',
       key: 'privacy_settings',
@@ -76,7 +76,7 @@ export const migration: Migration = {
     });
 
     // created_at
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: 'user_settings',
       key: 'created_at',
@@ -84,7 +84,7 @@ export const migration: Migration = {
     });
 
     // updated_at
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: 'user_settings',
       key: 'updated_at',
@@ -94,7 +94,7 @@ export const migration: Migration = {
     console.log('Creating indexes...');
 
     // Create unique index on user_id
-    await databases.createIndex({
+    await createIndex({
       databaseId,
       collectionId: 'user_settings',
       key: 'idx_user_id',

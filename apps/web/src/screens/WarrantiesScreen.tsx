@@ -1,6 +1,6 @@
 import React from "react";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
 import { MOCK_WARRANTIES } from "../constants";
 import type { Warranty, UserRole } from "../types";
 import { PlusIcon, AlertTriangleIcon, ShieldCheckIcon } from "../assets/Icons";
