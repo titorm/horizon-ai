@@ -185,7 +185,7 @@
   - Garantir que layout funcione como Client Component
   - _Requirements: 9.2_
 
-- [ ] 16. Migrar componentes de modais
+- [x] 16. Migrar componentes de modais
   - Criar components/modals/ e migrar AddAccountModal, AddCreditCardModal
   - Atualizar para usar API Routes do Next.js
   - Adaptar para Client Components

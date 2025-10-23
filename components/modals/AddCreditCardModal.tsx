@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 import type { CreateCreditCardInput } from '../../hooks/useCreditCards';
 

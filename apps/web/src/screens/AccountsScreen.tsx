@@ -6,8 +6,8 @@ import Skeleton from "@/components/ui/Skeleton";
 import { DropdownMenu, DropdownMenuItem } from "@/components/ui/DropdownMenu";
 import { useAccounts } from "../hooks/useAccounts";
 import { useTotalBalance } from "../hooks/useTotalBalance";
-import { AddAccountModal } from "../components/modals/AddAccountModal";
-import { AddCreditCardModal } from "../components/modals/AddCreditCardModal";
+import { AddAccountModal } from "@/components/modals/AddAccountModal";
+import { AddCreditCardModal } from "@/components/modals/AddCreditCardModal";
 import { apiFetch } from "../config/api";
 import type { Account, AccountStatus, CreditCard } from "../types";
 

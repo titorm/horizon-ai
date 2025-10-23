@@ -230,8 +230,8 @@ User clicks menu (3 dots)
 ### Created (5 files)
 1. `apps/web/src/hooks/useAccounts.ts`
 2. `apps/web/src/hooks/useCreditCards.ts`
-3. `apps/web/src/components/modals/AddAccountModal.tsx`
-4. `apps/web/src/components/modals/AddCreditCardModal.tsx`
+3. `components/modals/AddAccountModal.tsx`
+4. `components/modals/AddCreditCardModal.tsx`
 5. `docs/FRONTEND-ACCOUNTS-SUMMARY.md` (this file)
 
 ### Modified (2 files)
