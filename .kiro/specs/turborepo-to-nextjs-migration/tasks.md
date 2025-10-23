@@ -87,28 +87,28 @@
   - Implementar funções de CRUD de transações e estatísticas
   - _Requirements: 3.1, 3.2, 3.3_
 
-- [ ] 9. Criar API Routes para autenticação
-- [ ] 9.1 Criar API Route de sign-in
+- [x] 9. Criar API Routes para autenticação
+- [x] 9.1 Criar API Route de sign-in
   - Criar app/api/auth/sign-in/route.ts
   - Implementar POST handler com validação
   - Integrar com auth.service.ts
   - Configurar cookie de autenticação
   - _Requirements: 3.1_
 
-- [ ] 9.2 Criar API Route de sign-up
+- [x] 9.2 Criar API Route de sign-up
   - Criar app/api/auth/sign-up/route.ts
   - Implementar POST handler com validação
   - Integrar com auth.service.ts
   - Configurar cookie de autenticação
   - _Requirements: 3.1_
 
-- [ ] 9.3 Criar API Route de sign-out
+- [x] 9.3 Criar API Route de sign-out
   - Criar app/api/auth/sign-out/route.ts
   - Implementar POST handler
   - Limpar cookie de autenticação
   - _Requirements: 3.1_
 
-- [ ] 9.4 Criar API Route de me (current user)
+- [x] 9.4 Criar API Route de me (current user)
   - Criar app/api/auth/me/route.ts
   - Implementar GET handler
   - Retornar dados do usuário autenticado
