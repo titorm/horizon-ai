@@ -120,14 +120,14 @@
   - Implementar validação de dados
   - _Requirements: 3.1_
 
-- [ ] 11. Criar API Routes para contas bancárias
-- [ ] 11.1 Criar API Routes base de accounts
+- [x] 11. Criar API Routes para contas bancárias
+- [x] 11.1 Criar API Routes base de accounts
   - Criar app/api/accounts/route.ts com GET (list) e POST (create) handlers
   - Integrar com account.service.ts
   - Implementar validação de dados
   - _Requirements: 3.1_
 
-- [ ] 11.2 Criar API Routes de account por ID
+- [x] 11.2 Criar API Routes de account por ID
   - Criar app/api/accounts/[id]/route.ts com GET, PATCH e DELETE handlers
   - Integrar com account.service.ts
   - Implementar validação de ownership
