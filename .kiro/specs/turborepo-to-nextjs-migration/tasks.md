@@ -178,7 +178,7 @@
   - Garantir compatibilidade com Server e Client Components
   - _Requirements: 9.1_
 
-- [ ] 15. Migrar componentes de layout
+- [x] 15. Migrar componentes de layout
   - Criar components/layout/ e migrar DashboardLayout, Header, Sidebar, Footer
   - Adaptar DashboardLayout para receber user como prop
   - Atualizar navegação para usar Next.js Link e useRouter
