@@ -149,24 +149,24 @@
   - Listar cartões de uma conta específica
   - _Requirements: 3.1_
 
-- [ ] 13. Criar API Routes para transações
-- [ ] 13.1 Criar API Routes base de transactions
+- [x] 13. Criar API Routes para transações
+- [x] 13.1 Criar API Routes base de transactions
   - Criar app/api/transactions/route.ts com GET (list) handler
   - Integrar com transaction.service.ts
   - Implementar filtros e paginação
   - _Requirements: 3.1_
 
-- [ ] 13.2 Criar API Route de transação manual
+- [x] 13.2 Criar API Route de transação manual
   - Criar app/api/transactions/manual/route.ts com POST handler
   - Permitir criação manual de transações
   - _Requirements: 3.1_
 
-- [ ] 13.3 Criar API Routes de transaction por ID
+- [x] 13.3 Criar API Routes de transaction por ID
   - Criar app/api/transactions/[id]/route.ts com GET, PATCH e DELETE handlers
   - Integrar com transaction.service.ts
   - _Requirements: 3.1_
 
-- [ ] 13.4 Criar API Route de estatísticas
+- [x] 13.4 Criar API Route de estatísticas
   - Criar app/api/transactions/stats/[userId]/route.ts com GET handler
   - Retornar estatísticas de transações do usuário
   - _Requirements: 3.1_
