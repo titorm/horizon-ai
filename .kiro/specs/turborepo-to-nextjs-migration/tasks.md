@@ -133,18 +133,18 @@
   - Implementar validação de ownership
   - _Requirements: 3.1_
 
-- [ ] 12. Criar API Routes para cartões de crédito
-- [ ] 12.1 Criar API Routes base de credit-cards
+- [x] 12. Criar API Routes para cartões de crédito
+- [x] 12.1 Criar API Routes base de credit-cards
   - Criar app/api/credit-cards/route.ts com POST (create) handler
   - Integrar com credit-card.service.ts
   - _Requirements: 3.1_
 
-- [ ] 12.2 Criar API Routes de credit-card por ID
+- [x] 12.2 Criar API Routes de credit-card por ID
   - Criar app/api/credit-cards/[id]/route.ts com GET, PATCH e DELETE handlers
   - Integrar com credit-card.service.ts
   - _Requirements: 3.1_
 
-- [ ] 12.3 Criar API Route de credit-cards por account
+- [x] 12.3 Criar API Route de credit-cards por account
   - Criar app/api/credit-cards/account/[accountId]/route.ts com GET handler
   - Listar cartões de uma conta específica
   - _Requirements: 3.1_

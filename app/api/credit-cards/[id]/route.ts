@@ -1,0 +1,213 @@
+import { getCurrentUserId } from '@/lib/auth/session';
+import { CreditCardService } from '@/lib/services/credit-card.service';
+import { NextRequest, NextResponse } from 'next/server';
+
+/**
+ * GET /api/credit-cards/[id]
+ * Get a specific credit card by ID
+ */
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    // Get authenticated user ID
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const creditCardId = params.id;
+
+    if (!creditCardId) {
+      return NextResponse.json({ message: 'Credit card ID is required' }, { status: 400 });
+    }
+
+    // Fetch credit card
+    const creditCardService = new CreditCardService();
+    const creditCard = await creditCardService.getCreditCardById(creditCardId);
+
+    return NextResponse.json({
+      success: true,
+      data: creditCard,
+    });
+  } catch (error: any) {
+    console.error('GET /api/credit-cards/[id] error:', error);
+
+    // Check if it's a not found error
+    if (error.message.includes('not found')) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Credit card not found',
+        },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: error.message || 'Failed to fetch credit card',
+      },
+      { status: 500 },
+    );
+  }
+}
+
+/**
+ * PATCH /api/credit-cards/[id]
+ * Update a specific credit card
+ */
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    // Get authenticated user ID
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const creditCardId = params.id;
+
+    if (!creditCardId) {
+      return NextResponse.json({ message: 'Credit card ID is required' }, { status: 400 });
+    }
+
+    // Parse request body
+    const body = await request.json();
+
+    // Validate fields if provided
+    if (body.name !== undefined && typeof body.name !== 'string') {
+      return NextResponse.json({ message: 'Credit card name must be a string' }, { status: 400 });
+    }
+
+    if (body.credit_limit !== undefined) {
+      const creditLimit = Number(body.credit_limit);
+      if (isNaN(creditLimit) || creditLimit < 0) {
+        return NextResponse.json({ message: 'Credit limit must be a non-negative number' }, { status: 400 });
+      }
+    }
+
+    if (body.used_limit !== undefined) {
+      const usedLimit = Number(body.used_limit);
+      if (isNaN(usedLimit) || usedLimit < 0) {
+        return NextResponse.json({ message: 'Used limit must be a non-negative number' }, { status: 400 });
+      }
+    }
+
+    if (body.closing_day !== undefined) {
+      const closingDay = Number(body.closing_day);
+      if (isNaN(closingDay) || closingDay < 1 || closingDay > 31) {
+        return NextResponse.json({ message: 'Closing day must be between 1 and 31' }, { status: 400 });
+      }
+    }
+
+    if (body.due_day !== undefined) {
+      const dueDay = Number(body.due_day);
+      if (isNaN(dueDay) || dueDay < 1 || dueDay > 31) {
+        return NextResponse.json({ message: 'Due day must be between 1 and 31' }, { status: 400 });
+      }
+    }
+
+    if (body.brand !== undefined) {
+      const validBrands = ['visa', 'mastercard', 'elo', 'amex', 'other'];
+      if (!validBrands.includes(body.brand)) {
+        return NextResponse.json(
+          {
+            message: `Invalid brand. Must be one of: ${validBrands.join(', ')}`,
+          },
+          { status: 400 },
+        );
+      }
+    }
+
+    // Update credit card
+    const creditCardService = new CreditCardService();
+    const creditCard = await creditCardService.updateCreditCard(creditCardId, {
+      name: body.name,
+      credit_limit: body.credit_limit,
+      used_limit: body.used_limit,
+      closing_day: body.closing_day,
+      due_day: body.due_day,
+      brand: body.brand,
+      network: body.network,
+      color: body.color,
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: creditCard,
+    });
+  } catch (error: any) {
+    console.error('PATCH /api/credit-cards/[id] error:', error);
+
+    // Check if it's a not found error
+    if (error.message.includes('not found')) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Credit card not found',
+        },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: error.message || 'Failed to update credit card',
+      },
+      { status: 500 },
+    );
+  }
+}
+
+/**
+ * DELETE /api/credit-cards/[id]
+ * Delete a specific credit card
+ */
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    // Get authenticated user ID
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const creditCardId = params.id;
+
+    if (!creditCardId) {
+      return NextResponse.json({ message: 'Credit card ID is required' }, { status: 400 });
+    }
+
+    // Delete credit card
+    const creditCardService = new CreditCardService();
+    await creditCardService.deleteCreditCard(creditCardId);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Credit card deleted successfully',
+    });
+  } catch (error: any) {
+    console.error('DELETE /api/credit-cards/[id] error:', error);
+
+    // Check if it's a not found error
+    if (error.message.includes('not found')) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Credit card not found',
+        },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: error.message || 'Failed to delete credit card',
+      },
+      { status: 500 },
+    );
+  }
+}
