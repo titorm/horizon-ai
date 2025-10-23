@@ -49,14 +49,14 @@
   - Adaptar para usar await cookies() conforme Next.js 16
   - _Requirements: 3.5, 6.2, 6.3, 10.8_
 
-- [ ] 7. Implementar middleware de autenticação
+- [x] 7. Implementar middleware de autenticação
   - Criar app/middleware.ts para proteção de rotas
   - Implementar verificação de JWT em rotas protegidas
   - Configurar redirecionamentos (login para não autenticados, overview para autenticados)
   - Definir rotas públicas e protegidas
   - _Requirements: 6.1, 6.4, 6.5_
 
-- [ ] 8. Migrar services do NestJS para lib/services
+- [-] 8. Migrar services do NestJS para lib/services
 - [ ] 8.1 Migrar auth.service.ts
   - Criar lib/services/auth.service.ts com funções signIn, signUp, signOut
   - Migrar lógica de autenticação do NestJS AuthService
