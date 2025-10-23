@@ -52,6 +52,7 @@ export class TransactionsController {
       currency: data.currency,
       source: data.source,
       accountId: data.account_id,
+      creditCardId: data.credit_card_id,
       merchant: data.merchant,
       integrationId: data.integration_id,
       integrationData: data.integration_data,

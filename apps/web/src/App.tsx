@@ -101,8 +101,10 @@ function App() {
             };
             setUser(newUser);
             localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
-            setScreen("welcome");
-            showToast("Account created successfully!", "success");
+            // Skip onboarding - go directly to dashboard
+            setScreen("dashboard/overview");
+            showToast("Account created successfully! Welcome to Horizon AI!", "success");
+            simulateLoading();
         } catch (err) {
             console.error(err);
             showToast("Network error. Try again.", "error");
@@ -195,6 +197,14 @@ function App() {
         }
     };
 
+    const handleNavigate = (screenName: string, filters?: any) => {
+        setScreen(screenName as Screen);
+        // Store filters if provided (you can use state or context to pass them)
+        if (filters) {
+            sessionStorage.setItem('transactionFilters', JSON.stringify(filters));
+        }
+    };
+
     const renderCurrentScreen = () => {
         if (isLoading && !user) {
             // Only show full-page loading if we're checking for a user initially
@@ -223,27 +233,28 @@ function App() {
         }
 
         switch (screen) {
-            case "welcome":
-                return <WelcomeScreen onConnect={handleConnect} />;
-            case "onboarding/select-bank":
-                return <BankSelectionScreen onSelectBank={handleSelectBank} />;
-            case "onboarding/security":
-                return (
-                    <SecurityInterstitialScreen
-                        bankName={selectedBank?.name || ""}
-                        onContinue={handleSecurityContinue}
-                        onBack={handleBack}
-                    />
-                );
-            case "onboarding/loading":
-                return <LoadingScreen />;
+            // Onboarding removed - integration features on standby
+            // case "welcome":
+            //     return <WelcomeScreen onConnect={handleConnect} />;
+            // case "onboarding/select-bank":
+            //     return <BankSelectionScreen onSelectBank={handleSelectBank} />;
+            // case "onboarding/security":
+            //     return <SecurityInterstitialScreen ... />;
+            // case "onboarding/loading":
+            //     return <LoadingScreen />;
+            
             case "dashboard/pricing":
                 return <PricingScreen onSelectPlan={handleSelectPlan} onBack={() => setScreen("dashboard/overview")} />;
 
             // Default to dashboard layout for all other screens
             default:
                 return (
-                    <DashboardLayout user={user} activeScreen={screen} onNavigate={setScreen} onLogout={handleLogout}>
+                    <DashboardLayout 
+                        user={user} 
+                        activeScreen={screen} 
+                        onNavigate={setScreen} 
+                        onLogout={handleLogout}
+                    >
                         {(() => {
                             switch (screen) {
                                 case "dashboard/overview":
@@ -256,9 +267,9 @@ function App() {
                                         />
                                     );
                                 case "dashboard/accounts":
-                                    return <AccountsScreen isLoading={isLoading} />;
+                                    return <AccountsScreen isLoading={isLoading} onNavigate={handleNavigate} />;
                                 case "dashboard/transactions":
-                                    return <TransactionsScreen isLoading={isLoading} onShowToast={showToast} userId={user?.id} />;
+                                    return <TransactionsScreen isLoading={isLoading} onShowToast={showToast} userId={user?.$id} />;
                                 case "dashboard/categories":
                                     return <CategoriesScreen />;
                                 case "dashboard/invoices":

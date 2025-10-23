@@ -38,21 +38,47 @@ export interface Bank {
   logo: React.FC<React.SVGProps<SVGSVGElement>>;
 }
 
-export type AccountStatus = 'Connected' | 'Sync Error' | 'Disconnected';
+export type AccountStatus = 'Connected' | 'Sync Error' | 'Disconnected' | 'Manual';
+export type AccountType = 'checking' | 'savings' | 'investment' | 'other';
+
+export interface CreditCard {
+  $id: string;
+  account_id: string;
+  name: string;
+  last_digits: string;
+  credit_limit: number;
+  used_limit: number;
+  closing_day: number;
+  due_day: number;
+  brand?: 'visa' | 'mastercard' | 'elo' | 'amex' | 'other';
+  data?: string; // JSON string with additional data
+  $createdAt?: string;
+  $updatedAt?: string;
+}
 
 export interface Account {
-  id: string;
-  bankId: string;
-  lastDigits: string;
+  $id: string;
+  $createdAt: string;
+  $updatedAt: string;
+  user_id: string;
+  name: string;
+  bank_id?: string; // Optional for manual accounts
+  account_type: AccountType;
+  last_digits?: string;
   balance: number;
   status: AccountStatus;
-  lastSync: string;
+  last_sync?: string;
+  is_manual: boolean;
+  data?: string; // JSON string with additional data
+  created_at: string;
+  updated_at: string;
+  creditCards?: CreditCard[];
 }
 
 export type TransactionType = 'credit' | 'debit' | 'pix' | 'boleto';
 
 export interface Transaction {
-  id: string;
+  $id: string;
   description: string;
   amount: number;
   date: string;
@@ -61,12 +87,14 @@ export interface Transaction {
   type: TransactionType;
   icon: React.FC<{className?: string}>;
   notes?: string;
+  account_id?: string;
+  credit_card_id?: string;
 }
 
 export type InvoiceStatus = 'COMPLETED' | 'PROCESSING' | 'FAILED';
 
 export interface Invoice {
-  id: string;
+  $id: string;
   fileName: string;
   uploadDate: string;
   status: InvoiceStatus;
@@ -75,7 +103,7 @@ export interface Invoice {
 export type UserRole = 'FREE' | 'PREMIUM';
 
 export interface User {
-  id?: string;
+  $id?: string;
   name: string;
   role: UserRole;
   email?: string;
@@ -83,7 +111,7 @@ export interface User {
 
 
 export interface Category {
-    id: string;
+    $id: string;
     name: string;
     percentage?: number;
     transactionCount?: number;
@@ -91,7 +119,7 @@ export interface Category {
 }
 
 export interface Notification {
-    id: string;
+    $id: string;
     title: 'Warranty Expiring Soon' | 'Large Purchase Alert' | 'Weekly Summary Ready';
     description: string;
     date: string;
@@ -99,7 +127,7 @@ export interface Notification {
 }
 
 export interface Warranty {
-    id: string;
+    $id: string;
     productName: string;
     purchaseDate: string;
     expiresAt: string;
@@ -109,13 +137,13 @@ export interface Warranty {
 export type TaxSectionStatus = 'COMPLETED' | 'NEEDS_REVIEW' | 'NOT_STARTED';
 
 export interface TaxSection {
-    id: string;
+    $id: string;
     title: string;
     status: TaxSectionStatus;
 }
 
 export interface TaxAsset {
-  id: string;
+  $id: string;
   groupCode: string;
   groupName: string;
   itemCode: string;
@@ -127,7 +155,7 @@ export interface TaxAsset {
 }
 
 export interface TaxIncome {
-  id: string;
+  $id: string;
   type: 'EXEMPT' | 'EXCLUSIVE';
   code: string;
   description: string;
@@ -139,7 +167,7 @@ export interface TaxIncome {
 
 // Phase 4 Types
 export interface Beneficiary {
-  id: string;
+  $id: string;
   name: string;
   relationship: string;
   allocation: string;
@@ -147,7 +175,7 @@ export interface Beneficiary {
 }
 
 export interface InsurancePolicy {
-  id: string;
+  $id: string;
   type: 'Life' | 'Home' | 'Auto';
   provider: string;
   coverage: number;
@@ -166,7 +194,7 @@ export interface Integration {
 }
 
 export interface FinancialGoal {
-  id: string;
+  $id: string;
   name: string;
   targetAmount: number;
   currentAmount: number;
@@ -182,7 +210,7 @@ export interface SuggestedGoal {
 
 
 export interface FamilyMember {
-  id: string;
+  $id: string;
   name: string;
   role: 'Admin' | 'Member' | 'Child';
 }
@@ -190,7 +218,7 @@ export interface FamilyMember {
 export type InsightType = 'SAVINGS_OPPORTUNITY' | 'UNUSUAL_SPENDING' | 'CASH_FLOW_FORECAST';
 
 export interface FinancialInsight {
-  id: string;
+  $id: string;
   type: InsightType;
   title: string;
   description: string;
@@ -198,13 +226,13 @@ export interface FinancialInsight {
 }
 
 export interface ShoppingListItem {
-    id: string;
+    $id: string;
     name: string;
     checked: boolean;
 }
 
 export interface ShoppingList {
-    id: string;
+    $id: string;
     title: string;
     createdAt: string;
     items: ShoppingListItem[];
@@ -219,7 +247,7 @@ export interface PurchasedItem {
 }
 
 export interface PurchaseRecord {
-  id: string;
+  $id: string;
   storeName: string;
   purchaseDate: string;
   items: PurchasedItem[];

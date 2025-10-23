@@ -12,6 +12,8 @@ export const COLLECTIONS = {
   USER_PREFERENCES: 'user_preferences',
   USER_SETTINGS: 'user_settings',
   TRANSACTIONS: 'transactions',
+  ACCOUNTS: 'accounts',
+  CREDIT_CARDS: 'credit_cards',
 } as const;
 
 // Database ID - Configure no Appwrite Console
@@ -405,4 +407,102 @@ export interface TransactionData {
     interval: number;
     endDate?: string;
   };
+}
+
+// ============================================
+// Collection: accounts
+// ============================================
+export const accountsSchema = {
+  collectionId: COLLECTIONS.ACCOUNTS,
+  name: 'Accounts',
+  permissions: ['read("any")', 'write("any")'],
+  rowSecurity: true,
+  attributes: [
+    { key: 'user_id', type: 'string', size: 255, required: true, array: false },
+    { key: 'name', type: 'string', size: 255, required: true, array: false },
+    {
+      key: 'account_type',
+      type: 'enum',
+      elements: ['checking', 'savings', 'investment', 'other'],
+      required: true,
+      array: false,
+    },
+    { key: 'balance', type: 'float', required: true },
+    { key: 'is_manual', type: 'boolean', required: true },
+    { key: 'data', type: 'string', size: 16000, required: false, array: false }, // JSON field for bank_id, last_digits, status, etc.
+    { key: 'created_at', type: 'datetime', required: true },
+    { key: 'updated_at', type: 'datetime', required: true },
+  ],
+  indexes: [
+    { key: 'idx_user_id', type: 'key', attributes: ['user_id'], orders: ['ASC'] },
+    { key: 'idx_is_manual', type: 'key', attributes: ['is_manual'] },
+  ],
+};
+
+export interface Account {
+  $id: string;
+  $createdAt: string;
+  $updatedAt: string;
+  user_id: string;
+  name: string;
+  account_type: 'checking' | 'savings' | 'investment' | 'other';
+  balance: number;
+  is_manual: boolean;
+  data?: string; // JSON string
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AccountData {
+  bank_id?: string;
+  last_digits?: string;
+  status: 'Connected' | 'Sync Error' | 'Disconnected' | 'Manual';
+  last_sync?: string;
+  integration_id?: string;
+  integration_data?: any;
+}
+
+// ============================================
+// Collection: credit_cards
+// ============================================
+export const creditCardsSchema = {
+  collectionId: COLLECTIONS.CREDIT_CARDS,
+  name: 'Credit Cards',
+  permissions: ['read("any")', 'write("any")'],
+  rowSecurity: true,
+  attributes: [
+    { key: 'account_id', type: 'string', size: 255, required: true, array: false },
+    { key: 'name', type: 'string', size: 255, required: true, array: false },
+    { key: 'last_digits', type: 'string', size: 4, required: true, array: false },
+    { key: 'credit_limit', type: 'float', required: true },
+    { key: 'used_limit', type: 'float', required: true },
+    { key: 'closing_day', type: 'integer', required: true },
+    { key: 'due_day', type: 'integer', required: true },
+    { key: 'data', type: 'string', size: 4000, required: false, array: false }, // JSON field for brand, etc.
+    { key: 'created_at', type: 'datetime', required: true },
+    { key: 'updated_at', type: 'datetime', required: true },
+  ],
+  indexes: [{ key: 'idx_account_id', type: 'key', attributes: ['account_id'], orders: ['ASC'] }],
+};
+
+export interface CreditCard {
+  $id: string;
+  $createdAt: string;
+  $updatedAt: string;
+  account_id: string;
+  name: string;
+  last_digits: string;
+  credit_limit: number;
+  used_limit: number;
+  closing_day: number;
+  due_day: number;
+  data?: string; // JSON string
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreditCardData {
+  brand?: 'visa' | 'mastercard' | 'elo' | 'amex' | 'other';
+  network?: string;
+  color?: string;
 }

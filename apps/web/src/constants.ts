@@ -66,7 +66,7 @@ export const MOCK_CHART_DATA = [
 
 export const MOCK_TRANSACTIONS: Transaction[] = [
     {
-        id: "1",
+        $id: "1",
         description: "iFood",
         amount: -45.9,
         date: new Date().toISOString(),
@@ -77,7 +77,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
         notes: "Dinner with friends at the new pizza place.",
     },
     {
-        id: "2",
+        $id: "2",
         description: "Uber",
         amount: -22.5,
         date: new Date().toISOString(),
@@ -88,7 +88,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
         notes: "Trip to the office for the quarterly meeting.",
     },
     {
-        id: "3",
+        $id: "3",
         description: "Salary",
         amount: 8500.0,
         date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
@@ -99,7 +99,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
         notes: "Monthly salary deposit.",
     },
     {
-        id: "4",
+        $id: "4",
         description: "Renner",
         amount: -350.0,
         date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
@@ -110,7 +110,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
         notes: "New clothes for the trip.",
     },
     {
-        id: "5",
+        $id: "5",
         description: "Netflix",
         amount: -39.9,
         date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
@@ -121,7 +121,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
         notes: "Monthly subscription fee.",
     },
     {
-        id: "6",
+        $id: "6",
         description: "Pão de Açúcar",
         amount: -412.8,
         date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
@@ -132,7 +132,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
         notes: "Weekly grocery shopping.",
     },
     {
-        id: "7",
+        $id: "7",
         description: "Gym Membership",
         amount: -120.0,
         date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
@@ -142,7 +142,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
         icon: HeartIcon,
     },
     {
-        id: "8",
+        $id: "8",
         description: "Flight to Rio",
         amount: -850.0,
         date: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
@@ -155,15 +155,16 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
 ];
 
 export const MOCK_CATEGORIES: Category[] = [
-    { id: "cat-1", name: "Shopping", percentage: 35, transactionCount: 12, icon: ShoppingCartIcon },
-    { id: "cat-2", name: "Food & Dining", percentage: 25, transactionCount: 28, icon: UtensilsIcon },
-    { id: "cat-3", name: "Transport", percentage: 15, transactionCount: 15, icon: CarIcon },
-    { id: "cat-4", name: "Health & Wellness", percentage: 10, transactionCount: 5, icon: HeartIcon },
-    { id: "cat-5", name: "Travel", percentage: 8, transactionCount: 2, icon: PlaneIcon },
-    { id: "cat-6", name: "Work", percentage: 7, transactionCount: 4, icon: BriefcaseIcon },
+    { $id: "cat-1", name: "Shopping", percentage: 35, transactionCount: 12, icon: ShoppingCartIcon },
+    { $id: "cat-2", name: "Food & Dining", percentage: 25, transactionCount: 28, icon: UtensilsIcon },
+    { $id: "cat-3", name: "Transport", percentage: 15, transactionCount: 15, icon: CarIcon },
+    { $id: "cat-4", name: "Health & Wellness", percentage: 10, transactionCount: 5, icon: HeartIcon },
+    { $id: "cat-5", name: "Travel", percentage: 8, transactionCount: 2, icon: PlaneIcon },
+    { $id: "cat-6", name: "Work", percentage: 7, transactionCount: 4, icon: BriefcaseIcon },
 ];
 
 export const AVAILABLE_CATEGORY_ICONS: { name: string; component: FC<{ className?: string }> }[] = [
+    { name: "Balance", component: LandmarkIcon },
     { name: "Shopping", component: ShoppingCartIcon },
     { name: "Dining", component: UtensilsIcon },
     { name: "Transport", component: CarIcon },
@@ -179,29 +180,29 @@ export const AVAILABLE_CATEGORY_ICONS: { name: string; component: FC<{ className
 ];
 
 export const MOCK_INVOICES: Invoice[] = [
-    { id: "1", fileName: "apple-macbook-pro.pdf", uploadDate: "Oct 20, 2023", status: "COMPLETED" },
-    { id: "2", fileName: "fast-shop-tv.xml", uploadDate: "Oct 19, 2023", status: "COMPLETED" },
-    { id: "3", fileName: "invoice-09-2023.jpg", uploadDate: "Oct 18, 2023", status: "PROCESSING" },
-    { id: "4", fileName: "scan-001.png", uploadDate: "Oct 17, 2023", status: "FAILED" },
+    { $id: "1", fileName: "apple-macbook-pro.pdf", uploadDate: "Oct 20, 2023", status: "COMPLETED" },
+    { $id: "2", fileName: "fast-shop-tv.xml", uploadDate: "Oct 19, 2023", status: "COMPLETED" },
+    { $id: "3", fileName: "invoice-09-2023.jpg", uploadDate: "Oct 18, 2023", status: "PROCESSING" },
+    { $id: "4", fileName: "scan-001.png", uploadDate: "Oct 17, 2023", status: "FAILED" },
 ];
 
 export const MOCK_NOTIFICATIONS: Notification[] = [
     {
-        id: "1",
+        $id: "1",
         title: "Warranty Expiring Soon",
         description: "Your MacBook Pro warranty expires in 30 days. Consider an extension.",
         date: "2h ago",
         read: false,
     },
     {
-        id: "2",
+        $id: "2",
         title: "Large Purchase Alert",
         description: "A purchase of R$ 4,500.00 was made at Fast Shop.",
         date: "1d ago",
         read: false,
     },
     {
-        id: "3",
+        $id: "3",
         title: "Weekly Summary Ready",
         description: "Your financial summary for Oct 22-28 is ready to view.",
         date: "2d ago",
@@ -211,28 +212,28 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
 
 export const MOCK_WARRANTIES: Warranty[] = [
     {
-        id: "1",
+        $id: "1",
         productName: 'MacBook Pro 14"',
         purchaseDate: "Oct 20, 2022",
         expiresAt: "Oct 19, 2023",
         daysRemaining: 20,
     },
     {
-        id: "2",
+        $id: "2",
         productName: 'Samsung 65" TV',
         purchaseDate: "Sep 15, 2022",
         expiresAt: "Sep 14, 2023",
         daysRemaining: 80,
     },
     {
-        id: "3",
+        $id: "3",
         productName: "iPhone 15 Pro",
         purchaseDate: "Sep 30, 2023",
         expiresAt: "Sep 29, 2024",
         daysRemaining: 335,
     },
     {
-        id: "4",
+        $id: "4",
         productName: "AirPods Pro",
         purchaseDate: "Jan 05, 2022",
         expiresAt: "Jan 04, 2023",
@@ -241,10 +242,10 @@ export const MOCK_WARRANTIES: Warranty[] = [
 ];
 
 export const MOCK_TAX_SECTIONS: TaxSection[] = [
-    { id: "1", title: "Income from Employment", status: "COMPLETED" },
-    { id: "2", title: "Investment Gains (Stocks, FIIs)", status: "NEEDS_REVIEW" },
-    { id: "3", title: "Rental Income", status: "NOT_STARTED" },
-    { id: "4", title: "Deductible Expenses (Health, Education)", status: "COMPLETED" },
+    { $id: "1", title: "Income from Employment", status: "COMPLETED" },
+    { $id: "2", title: "Investment Gains (Stocks, FIIs)", status: "NEEDS_REVIEW" },
+    { $id: "3", title: "Rental Income", status: "NOT_STARTED" },
+    { $id: "4", title: "Deductible Expenses (Health, Education)", status: "COMPLETED" },
 ];
 
 export const MOCK_RETIREMENT_GOAL = {
@@ -256,7 +257,7 @@ export const MOCK_RETIREMENT_GOAL = {
 
 export const MOCK_TAX_ASSETS: TaxAsset[] = [
     {
-        id: "1",
+        $id: "1",
         groupCode: "04",
         groupName: "Aplicações e Investimentos",
         itemCode: "01",
@@ -267,7 +268,7 @@ export const MOCK_TAX_ASSETS: TaxAsset[] = [
         value2024: 10.0,
     },
     {
-        id: "2",
+        $id: "2",
         groupCode: "07",
         groupName: "Fundos",
         itemCode: "01",
@@ -278,7 +279,7 @@ export const MOCK_TAX_ASSETS: TaxAsset[] = [
         value2024: 150613.17,
     },
     {
-        id: "3",
+        $id: "3",
         groupCode: "04",
         groupName: "Aplicações e Investimentos",
         itemCode: "02",
@@ -292,7 +293,7 @@ export const MOCK_TAX_ASSETS: TaxAsset[] = [
 
 export const MOCK_TAX_INCOMES: TaxIncome[] = [
     {
-        id: "1",
+        $id: "1",
         type: "EXEMPT",
         code: "12",
         description:
@@ -302,7 +303,7 @@ export const MOCK_TAX_INCOMES: TaxIncome[] = [
         sourceCnpj: "60.701.190/0001-04",
     },
     {
-        id: "2",
+        $id: "2",
         type: "EXCLUSIVE",
         code: "06",
         description: "Rendimentos de aplicações financeiras",
@@ -314,7 +315,7 @@ export const MOCK_TAX_INCOMES: TaxIncome[] = [
 
 export const MOCK_INSIGHTS: FinancialInsight[] = [
     {
-        id: "1",
+        $id: "1",
         type: "SAVINGS_OPPORTUNITY",
         title: "Save R$ 480/year on Subscriptions",
         description:
@@ -322,7 +323,7 @@ export const MOCK_INSIGHTS: FinancialInsight[] = [
         actionText: "Review Subscriptions",
     },
     {
-        id: "2",
+        $id: "2",
         type: "UNUSUAL_SPENDING",
         title: 'Higher than usual spending in "Food & Dining"',
         description:
@@ -330,7 +331,7 @@ export const MOCK_INSIGHTS: FinancialInsight[] = [
         actionText: "View Transactions",
     },
     {
-        id: "3",
+        $id: "3",
         type: "CASH_FLOW_FORECAST",
         title: "Positive Cash Flow Forecast",
         description:
@@ -432,35 +433,35 @@ export const MOCK_INTEGRATIONS: Integration[] = [
 
 export const MOCK_SHOPPING_LISTS: ShoppingList[] = [
     {
-        id: "1",
+        $id: "1",
         title: "Weekly Groceries",
         createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
         items: [
-            { id: "1-1", name: "Milk", checked: true },
-            { id: "1-2", name: "Bread", checked: true },
-            { id: "1-3", name: "Eggs (dozen)", checked: true },
-            { id: "1-4", name: "Chicken breast (1kg)", checked: false },
-            { id: "1-5", name: "Rice (2kg)", checked: true },
-            { id: "1-6", name: "Beans (1kg)", checked: true },
+            { $id: "1-1", name: "Milk", checked: true },
+            { $id: "1-2", name: "Bread", checked: true },
+            { $id: "1-3", name: "Eggs (dozen)", checked: true },
+            { $id: "1-4", name: "Chicken breast (1kg)", checked: false },
+            { $id: "1-5", name: "Rice (2kg)", checked: true },
+            { $id: "1-6", name: "Beans (1kg)", checked: true },
         ],
     },
     {
-        id: "2",
+        $id: "2",
         title: "Barbecue for friends",
         createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         items: [
-            { id: "2-1", name: "Picanha (2kg)", checked: true },
-            { id: "2-2", name: "Sausage (1kg)", checked: true },
-            { id: "2-3", name: "Garlic bread", checked: true },
-            { id: "2-4", name: "Charcoal", checked: true },
-            { id: "2-5", name: "Beer (2 packs)", checked: true },
+            { $id: "2-1", name: "Picanha (2kg)", checked: true },
+            { $id: "2-2", name: "Sausage (1kg)", checked: true },
+            { $id: "2-3", name: "Garlic bread", checked: true },
+            { $id: "2-4", name: "Charcoal", checked: true },
+            { $id: "2-5", name: "Beer (2 packs)", checked: true },
         ],
     },
 ];
 
 export const MOCK_PURCHASE_HISTORY: PurchaseRecord[] = [
     {
-        id: "pr-1",
+        $id: "pr-1",
         storeName: "Pão de Açúcar",
         purchaseDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
         totalAmount: 412.8,
@@ -476,25 +477,25 @@ export const MOCK_PURCHASE_HISTORY: PurchaseRecord[] = [
 
 // Phase 4 Mocks
 export const MOCK_BENEFICIARIES: Beneficiary[] = [
-    { id: "1", name: "Carlos Silva", relationship: "Spouse", allocation: "50% of investments", status: "Confirmed" },
-    { id: "2", name: "Joana Silva", relationship: "Daughter", allocation: "25% of investments", status: "Confirmed" },
-    { id: "3", name: "Pedro Silva", relationship: "Son", allocation: "25% of investments", status: "Pending" },
+    { $id: "1", name: "Carlos Silva", relationship: "Spouse", allocation: "50% of investments", status: "Confirmed" },
+    { $id: "2", name: "Joana Silva", relationship: "Daughter", allocation: "25% of investments", status: "Confirmed" },
+    { $id: "3", name: "Pedro Silva", relationship: "Son", allocation: "25% of investments", status: "Pending" },
 ];
 
 export const MOCK_INSURANCE_POLICIES: InsurancePolicy[] = [
-    { id: "1", type: "Life", provider: "Seguradora XYZ", coverage: 1000000, premium: 99, status: "Active" },
-    { id: "2", type: "Home", provider: "Porto Seguro", coverage: 800000, premium: 250, status: "Active" },
-    { id: "3", type: "Auto", provider: "Tokio Marine", coverage: 50000, premium: 180, status: "Expiring Soon" },
+    { $id: "1", type: "Life", provider: "Seguradora XYZ", coverage: 1000000, premium: 99, status: "Active" },
+    { $id: "2", type: "Home", provider: "Porto Seguro", coverage: 800000, premium: 250, status: "Active" },
+    { $id: "3", type: "Auto", provider: "Tokio Marine", coverage: 50000, premium: 180, status: "Expiring Soon" },
 ];
 
 export const MOCK_FINANCIAL_GOALS: FinancialGoal[] = [
-    { id: "1", name: "Buy a house", targetAmount: 600000, currentAmount: 150000, targetDate: "Dec 2027" },
-    { id: "2", name: "Vacation", targetAmount: 30000, currentAmount: 28000, targetDate: "Jun 2025" },
-    { id: "3", name: "Kids' Education", targetAmount: 200000, currentAmount: 45000, targetDate: "Aug 2028" },
+    { $id: "1", name: "Buy a house", targetAmount: 600000, currentAmount: 150000, targetDate: "Dec 2027" },
+    { $id: "2", name: "Vacation", targetAmount: 30000, currentAmount: 28000, targetDate: "Jun 2025" },
+    { $id: "3", name: "Kids' Education", targetAmount: 200000, currentAmount: 45000, targetDate: "Aug 2028" },
 ];
 
 export const MOCK_FAMILY_MEMBERS: FamilyMember[] = [
-    { id: "1", name: "Mariana Silva", role: "Admin" },
-    { id: "2", name: "Carlos Silva", role: "Member" },
-    { id: "3", name: "Joana Silva", role: "Child" },
+    { $id: "1", name: "Mariana Silva", role: "Admin" },
+    { $id: "2", name: "Carlos Silva", role: "Member" },
+    { $id: "3", name: "Joana Silva", role: "Child" },
 ];

@@ -28,26 +28,14 @@ const TransactionItem: React.FC<{ transaction: Transaction }> = ({ transaction }
 };
 
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ userName, onConnectAnother }) => {
-    const formattedBalance = MOCK_BALANCE.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-    });
-
     return (
-        <div className="max-w-4xl mx-auto p-4 md:p-8">
+        <div className="max-w-4xl mx-auto">
             <header className="py-6">
                 <h1 className="text-3xl font-normal text-on-surface">Hi, {userName}!</h1>
                 <p className="text-base text-on-surface-variant">Welcome to your financial dashboard.</p>
             </header>
 
             <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-3">
-                    <Card className="p-6">
-                        <p className="text-sm font-medium text-on-surface-variant mb-1">Total Balance</p>
-                        <h2 className="text-5xl font-normal text-primary">{formattedBalance}</h2>
-                    </Card>
-                </div>
-
                 <div className="lg:col-span-3">
                     <Card className="p-6">
                         <div className="flex justify-between items-center mb-4">

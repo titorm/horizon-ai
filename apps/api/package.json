@@ -32,6 +32,7 @@
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
     "dotenv": "^17.2.3",
+    "febraban-bank-holidays": "^1.2.0",
     "node-appwrite": "^20.2.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

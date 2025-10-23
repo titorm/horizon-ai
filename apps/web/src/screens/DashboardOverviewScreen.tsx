@@ -3,9 +3,6 @@ import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import {
     MOCK_BALANCE,
-    MOCK_MONTHLY_INCOME,
-    MOCK_MONTHLY_EXPENSES,
-    MOCK_CHART_DATA,
     AVAILABLE_CATEGORY_ICONS,
 } from "../constants";
 import type { Transaction, User, FinancialInsight, InsightType, Screen } from "../types";
@@ -21,6 +18,39 @@ import {
 import Skeleton from "../components/ui/Skeleton";
 import { useTransactions } from "../hooks/useTransactions";
 import { useFinancialInsights } from "../hooks/useFinancialInsights";
+import { useTotalBalance } from "../hooks/useTotalBalance";
+import { useAccounts } from "../hooks/useAccounts";
+
+// --- Helper Functions for Date Filtering ---
+const getMonthKey = (date: Date): string => {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+};
+
+const getCurrentMonthKey = (): string => {
+    return getMonthKey(new Date());
+};
+
+const getPreviousMonthKey = (): string => {
+    const now = new Date();
+    const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    return getMonthKey(prevMonth);
+};
+
+const getLastSixMonths = (): string[] => {
+    const months: string[] = [];
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        months.push(getMonthKey(date));
+    }
+    return months;
+};
+
+const getMonthName = (monthKey: string): string => {
+    const [year, month] = monthKey.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+    return date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+};
 
 // --- BarChart Component Definition ---
 interface ChartData {
@@ -227,11 +257,18 @@ const DashboardOverviewSkeleton: React.FC = () => (
     </>
 );
 
-const StatCard: React.FC<{ label: string; value: number; icon: React.ReactNode; isNet?: boolean }> = ({
+const StatCard: React.FC<{ 
+    label: string; 
+    value: number; 
+    icon: React.ReactNode; 
+    isNet?: boolean;
+    previousValue?: number;
+}> = ({
     label,
     value,
     icon,
     isNet,
+    previousValue,
 }) => {
     const isPositive = value >= 0;
     let colorClass = "text-on-surface";
@@ -247,12 +284,43 @@ const StatCard: React.FC<{ label: string; value: number; icon: React.ReactNode; 
         isPositive && (isNet || label.toLowerCase().includes("income")) ? "+" : ""
     }${value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
 
+    // Calculate percentage change
+    let percentageChange: number | null = null;
+    let isImprovement = false;
+    
+    if (previousValue !== undefined && previousValue !== 0) {
+        const change = value - previousValue;
+        percentageChange = (change / Math.abs(previousValue)) * 100;
+        
+        // For income and net: increase is improvement
+        // For expenses: decrease is improvement
+        if (label.toLowerCase().includes("expense")) {
+            isImprovement = change < 0;
+        } else {
+            isImprovement = change > 0;
+        }
+    }
+
     return (
         <Card className="p-4 flex items-center">
             <div className={`mr-4 p-2 rounded-full bg-primary-container`}>{icon}</div>
-            <div>
+            <div className="flex-grow">
                 <p className="text-sm text-on-surface-variant">{label}</p>
-                <p className={`text-xl font-medium ${colorClass}`}>{formattedValue}</p>
+                <div className="flex items-center gap-2">
+                    <p className={`text-xl font-medium ${colorClass}`}>{formattedValue}</p>
+                    {percentageChange !== null && (
+                        <div className={`flex items-center text-xs font-medium ${
+                            isImprovement ? 'text-secondary' : 'text-error'
+                        }`}>
+                            {isImprovement ? (
+                                <TrendingUpIcon className="w-4 h-4" />
+                            ) : (
+                                <TrendingDownIcon className="w-4 h-4" />
+                            )}
+                            <span>{Math.abs(percentageChange).toFixed(1)}%</span>
+                        </div>
+                    )}
+                </div>
             </div>
         </Card>
     );
@@ -312,8 +380,10 @@ const DashboardOverviewScreen: React.FC<{
     isLoading,
     onNavigate,
 }) => {
-    const userId = user?.id || "default-user";
+    const userId = user?.$id || "default-user";
     const { transactions: apiTransactions, isLoading: isLoadingTransactions } = useTransactions(userId);
+    const { totalBalance, loading: loadingBalance } = useTotalBalance();
+    const { accounts } = useAccounts();
 
     // Generate AI insights based on real transaction data
     const aiInsights = useFinancialInsights(apiTransactions);
@@ -331,67 +401,140 @@ const DashboardOverviewScreen: React.FC<{
                 (cat) => cat.name.toLowerCase() === apiTx.category?.toLowerCase()
             )?.component || SwapIcon;
             
+            // Find account name from accountId
+            const account = accounts.find((acc) => acc.$id === apiTx.accountId);
+            const accountName = account?.name || (apiTx.accountId ? apiTx.accountId : 'Manual Entry');
+            
             return {
-                id: apiTx.$id,
+                $id: apiTx.$id,
                 description: apiTx.description || apiTx.merchant || 'Transaction',
                 amount: apiTx.type === 'income' ? Math.abs(apiTx.amount) : -Math.abs(apiTx.amount),
                 date: apiTx.date,
-                bankName: apiTx.accountId || 'Manual Entry',
+                bankName: accountName,
                 category: apiTx.category || 'Uncategorized',
                 type: apiTx.source === 'manual' ? 'credit' : 
                       apiTx.type === 'income' ? 'credit' : 'debit',
                 icon: categoryIcon,
                 notes: apiTx.description || '',
+                account_id: apiTx.accountId,
+                credit_card_id: apiTx.creditCardId,
             };
         });
+    }, [apiTransactions, accounts]);
+
+    // Calculate monthly metrics from real transactions
+    const monthlyMetrics = useMemo(() => {
+        const currentMonthKey = getCurrentMonthKey();
+        const previousMonthKey = getPreviousMonthKey();
+        
+        // Group transactions by month
+        const transactionsByMonth = apiTransactions.reduce((acc, tx) => {
+            const txDate = new Date(tx.date);
+            const monthKey = getMonthKey(txDate);
+            
+            if (!acc[monthKey]) {
+                acc[monthKey] = { income: 0, expenses: 0 };
+            }
+            
+            if (tx.type === 'income') {
+                acc[monthKey].income += Math.abs(tx.amount);
+            } else {
+                acc[monthKey].expenses += Math.abs(tx.amount);
+            }
+            
+            return acc;
+        }, {} as Record<string, { income: number; expenses: number }>);
+        
+        // Current month metrics
+        const currentMonth = transactionsByMonth[currentMonthKey] || { income: 0, expenses: 0 };
+        const currentIncome = currentMonth.income;
+        const currentExpenses = -currentMonth.expenses; // Negative for display
+        const currentNet = currentIncome + currentExpenses;
+        
+        // Previous month metrics
+        const previousMonth = transactionsByMonth[previousMonthKey] || { income: 0, expenses: 0 };
+        const previousIncome = previousMonth.income;
+        const previousExpenses = -previousMonth.expenses;
+        const previousNet = previousIncome + previousExpenses;
+        
+        return {
+            currentIncome,
+            currentExpenses,
+            currentNet,
+            previousIncome,
+            previousExpenses,
+            previousNet,
+            transactionsByMonth,
+        };
     }, [apiTransactions]);
 
-    if (isLoading || isLoadingTransactions) {
+    // Generate chart data for last 6 months
+    const chartData = useMemo(() => {
+        const lastSixMonths = getLastSixMonths();
+        return lastSixMonths.map((monthKey) => {
+            const monthData = monthlyMetrics.transactionsByMonth[monthKey] || { income: 0, expenses: 0 };
+            return {
+                month: getMonthName(monthKey),
+                income: monthData.income,
+                expenses: monthData.expenses,
+            };
+        });
+    }, [monthlyMetrics]);
+
+    // Check if we have any transactions
+    const hasTransactions = apiTransactions.length > 0;
+
+    if (isLoading || isLoadingTransactions || loadingBalance) {
         return <DashboardOverviewSkeleton />;
     }
 
-    const formattedBalance = MOCK_BALANCE.toLocaleString("pt-BR", {
+    const formattedBalance = totalBalance.toLocaleString("pt-BR", {
         style: "currency",
         currency: "BRL",
     });
-    const netMonthly = MOCK_MONTHLY_INCOME + MOCK_MONTHLY_EXPENSES;
 
     return (
         <>
-            <header className="mb-8">
-                <h1 className="text-4xl font-light text-on-surface">Hi, {user.name}!</h1>
-                <p className="text-base text-on-surface-variant">Welcome back to your financial dashboard.</p>
+            <header className="mb-8 flex justify-between items-end">
+                <div>
+                    <h1 className="text-4xl font-light text-on-surface">Hi, {user.name}!</h1>
+                    <p className="text-base text-on-surface-variant mt-1">Welcome back to your financial dashboard.</p>
+                </div>
+                <div className="text-right">
+                    <p className="text-sm font-medium text-on-surface-variant uppercase tracking-wider">Total Balance</p>
+                    <h2 className="text-3xl font-normal text-primary">{formattedBalance}</h2>
+                </div>
             </header>
 
             <main className="space-y-8">
-                <Card className="p-8 text-center">
-                    <p className="text-sm font-medium text-on-surface-variant mb-1">TOTAL BALANCE</p>
-                    <h2 className="text-5xl font-light text-primary tracking-tight">{formattedBalance}</h2>
-                </Card>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <StatCard
                         label="Income this month"
-                        value={MOCK_MONTHLY_INCOME}
+                        value={monthlyMetrics.currentIncome}
+                        previousValue={monthlyMetrics.previousIncome}
                         icon={<ArrowUpCircleIcon className="text-secondary" />}
                     />
                     <StatCard
                         label="Expenses this month"
-                        value={MOCK_MONTHLY_EXPENSES}
+                        value={monthlyMetrics.currentExpenses}
+                        previousValue={monthlyMetrics.previousExpenses}
                         icon={<ArrowDownCircleIcon className="text-error" />}
                     />
                     <StatCard
                         label="Net this month"
-                        value={netMonthly}
-                        icon={<TrendingUpIcon className={netMonthly > 0 ? "text-secondary" : "text-error"} />}
+                        value={monthlyMetrics.currentNet}
+                        previousValue={monthlyMetrics.previousNet}
+                        icon={<TrendingUpIcon className={monthlyMetrics.currentNet > 0 ? "text-secondary" : "text-error"} />}
                         isNet
                     />
                 </div>
 
-                <Card className="p-6">
-                    <h3 className="text-xl font-medium text-on-surface mb-6">Cash Flow - Last 6 Months</h3>
-                    <BarChart data={MOCK_CHART_DATA} />
-                </Card>
+                {hasTransactions && chartData.some(d => d.income > 0 || d.expenses > 0) && (
+                    <Card className="p-6">
+                        <h3 className="text-xl font-medium text-on-surface mb-6">Cash Flow - Last 6 Months</h3>
+                        <BarChart data={chartData} />
+                    </Card>
+                )}
 
                 {aiInsights.length > 0 && (
                     <div>
@@ -399,7 +542,7 @@ const DashboardOverviewScreen: React.FC<{
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {aiInsights.map((insight) => (
                                 <FinancialInsightCard 
-                                    key={insight.id} 
+                                    key={insight.$id} 
                                     insight={insight} 
                                     onNavigateToTransactions={handleNavigateToTransactions}
                                 />
@@ -418,7 +561,7 @@ const DashboardOverviewScreen: React.FC<{
                     <ul className="divide-y divide-outline">
                         {transactions.length > 0 ? (
                             transactions.slice(0, 5).map((tx) => (
-                                <TransactionItem key={tx.id} transaction={tx} />
+                                <TransactionItem key={tx.$id} transaction={tx} />
                             ))
                         ) : (
                             <li className="py-8 text-center text-on-surface-variant">

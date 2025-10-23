@@ -66,6 +66,7 @@ export class AppwriteTransactionService {
 
     // Add optional fields if present
     if (data.accountId) transactionData.account_id = data.accountId;
+    if (data.creditCardId) transactionData.credit_card_id = data.creditCardId;
     if (data.merchant) transactionData.merchant = data.merchant;
     if (data.tags) transactionData.tags = data.tags;
     if (data.location) transactionData.location = data.location;

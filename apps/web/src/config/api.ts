@@ -16,6 +16,22 @@ export const apiEndpoints = {
     profile: `${API_URL}/users/profile`,
     update: `${API_URL}/users/profile`,
   },
+  accounts: {
+    list: `${API_URL}/accounts`,
+    create: `${API_URL}/accounts`,
+    get: (id: string) => `${API_URL}/accounts/${id}`,
+    update: (id: string) => `${API_URL}/accounts/${id}`,
+    delete: (id: string) => `${API_URL}/accounts/${id}`,
+    balance: (id: string) => `${API_URL}/accounts/${id}/balance`,
+  },
+  creditCards: {
+    list: (accountId: string) => `${API_URL}/credit-cards/account/${accountId}`,
+    create: `${API_URL}/credit-cards`,
+    get: (id: string) => `${API_URL}/credit-cards/${id}`,
+    update: (id: string) => `${API_URL}/credit-cards/${id}`,
+    delete: (id: string) => `${API_URL}/credit-cards/${id}`,
+    updateUsedLimit: (id: string) => `${API_URL}/credit-cards/${id}/used-limit`,
+  },
   transactions: {
     list: `${API_URL}/transactions`,
     create: `${API_URL}/transactions/manual`,

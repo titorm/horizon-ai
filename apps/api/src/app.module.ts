@@ -8,6 +8,7 @@ import { HealthModule } from './health/health.module';
 import { AppwriteModule } from './appwrite/appwrite.module';
 import { UserModule } from './users/user.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { AccountsModule } from './database/accounts.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { TransactionsModule } from './transactions/transactions.module';
     HealthModule,
     UserModule,
     TransactionsModule,
+    AccountsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

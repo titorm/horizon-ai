@@ -13,6 +13,9 @@ import {
   Min,
 } from 'class-validator';
 
+// Export account DTOs
+export * from './account.dto';
+
 // ============================================
 // User DTOs
 // ============================================
@@ -350,6 +353,10 @@ export class CreateTransactionDto {
   @IsString()
   @IsOptional()
   accountId?: string;
+
+  @IsString()
+  @IsOptional()
+  creditCardId?: string;
 
   @IsString()
   @IsOptional()

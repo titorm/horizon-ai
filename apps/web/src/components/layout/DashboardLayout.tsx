@@ -53,7 +53,13 @@ interface DashboardLayoutProps {
     onLogout: () => void;
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, user, activeScreen, onNavigate, onLogout }) => {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ 
+    children, 
+    user, 
+    activeScreen, 
+    onNavigate, 
+    onLogout
+}) => {
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
     const handleLogoutClick = () => {

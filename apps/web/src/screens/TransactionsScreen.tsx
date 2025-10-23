@@ -8,6 +8,8 @@ import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import Modal from "../components/ui/Modal";
 import { useTransactions, createTransaction } from "../hooks/useTransactions";
+import { useAccounts } from "../hooks/useAccounts";
+import { useCreditCards } from "../hooks/useCreditCards";
 
 const TransactionItemSkeleton: React.FC = () => (
     <li className="flex items-center py-4 px-2">
@@ -135,7 +137,11 @@ const TransactionsScreen: React.FC<{
     isLoading: boolean;
     onShowToast: (message: string, type: "success" | "error") => void;
     userId?: string;
-}> = ({ isLoading: parentIsLoading, onShowToast, userId = "default-user" }) => {
+    initialFilters?: {
+        creditCardId?: string;
+        month?: string;
+    };
+}> = ({ isLoading: parentIsLoading, onShowToast, userId = "default-user", initialFilters }) => {
     // Fetch transactions from API
     const { 
         transactions: apiTransactions, 
@@ -143,6 +149,11 @@ const TransactionsScreen: React.FC<{
         error: transactionsError,
         refetch 
     } = useTransactions(userId);
+    
+    // Fetch accounts and credit cards
+    const { accounts } = useAccounts();
+    const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+    const { creditCards: allCreditCards } = useCreditCards(null);
     
     const [searchTerm, setSearchTerm] = useState("");
     const [showFilters, setShowFilters] = useState(false);
@@ -158,6 +169,8 @@ const TransactionsScreen: React.FC<{
         type: "credit" as TransactionType,
         notes: "",
         flow: "expense",
+        accountId: "",
+        creditCardId: "",
     };
     const [newTransaction, setNewTransaction] = useState(initialNewTransactionState);
 
@@ -185,19 +198,25 @@ const TransactionsScreen: React.FC<{
                 (c) => c.name.toLowerCase() === (apiTx.category || '').toLowerCase()
             )?.component || SwapIcon;
 
+            // Find account name from accountId
+            const account = accounts.find((acc) => acc.$id === apiTx.accountId);
+            const accountName = account?.name || (apiTx.accountId ? apiTx.accountId : 'Manual Entry');
+
             return {
-                id: apiTx.$id,
+                $id: apiTx.$id,
                 description: apiTx.description || apiTx.merchant || 'Transaction',
                 amount: apiTx.type === 'income' ? Math.abs(apiTx.amount) : -Math.abs(apiTx.amount),
                 date: apiTx.date,
-                bankName: apiTx.accountId || 'Manual Entry',
+                bankName: accountName,
                 category: apiTx.category || 'Uncategorized',
                 type: mapTransactionType(apiTx.type, apiTx.source),
                 icon: categoryIcon,
                 notes: apiTx.description,
+                account_id: apiTx.accountId,
+                credit_card_id: apiTx.creditCardId,
             };
         });
-    }, [apiTransactions]);
+    }, [apiTransactions, accounts]);
 
     const allCategories = useMemo(() => [...new Set(transactions.map((tx) => tx.category))], [transactions]);
     const allAccounts = useMemo(() => [...new Set(transactions.map((tx) => tx.bankName))], [transactions]);
@@ -269,6 +288,8 @@ const TransactionsScreen: React.FC<{
                 description: newTransaction.description,
                 date: new Date(newTransaction.date).toISOString(),
                 currency: 'BRL',
+                accountId: newTransaction.accountId || undefined,
+                creditCardId: newTransaction.creditCardId || undefined,
                 merchant: newTransaction.bankName,
                 tags: newTransaction.notes ? [newTransaction.notes] : undefined,
             });
@@ -283,6 +304,17 @@ const TransactionsScreen: React.FC<{
             onShowToast("Failed to add transaction. Please try again.", "error");
         }
     };
+
+    // Filter credit cards based on selected account
+    const availableCreditCards = useMemo(() => {
+        if (!newTransaction.accountId) return [];
+        return allCreditCards.filter(card => card.account_id === newTransaction.accountId);
+    }, [newTransaction.accountId, allCreditCards]);
+
+    // Reset credit card selection when account changes
+    useEffect(() => {
+        setNewTransaction(prev => ({ ...prev, creditCardId: "" }));
+    }, [newTransaction.accountId]);
 
     // Show error message if transactions failed to load
     // MUST be before any conditional returns (React Rules of Hooks)
@@ -474,7 +506,7 @@ const TransactionsScreen: React.FC<{
                             <ul className="divide-y divide-outline bg-surface-container rounded-xl p-1">
                                 {(transactions as Transaction[]).map((tx) => (
                                     <TransactionItem
-                                        key={tx.id}
+                                        key={tx.$id}
                                         transaction={tx}
                                         onClick={() => setSelectedTransaction(tx)}
                                     />
@@ -571,33 +603,66 @@ const TransactionsScreen: React.FC<{
                             onChange={(e) => setNewTransaction({ ...newTransaction, date: e.target.value })}
                             required
                         />
-                        <div className="grid grid-cols-2 gap-4">
+                        
+                        {/* Account Selection */}
+                        <div>
+                            <label htmlFor="account" className="block text-sm font-medium text-on-surface-variant mb-1">
+                                Conta *
+                            </label>
                             <select
+                                id="account"
                                 name="account"
-                                value={newTransaction.bankName}
-                                onChange={(e) => setNewTransaction({ ...newTransaction, bankName: e.target.value })}
+                                value={newTransaction.accountId}
+                                onChange={(e) => setNewTransaction({ ...newTransaction, accountId: e.target.value })}
                                 required
                                 className="w-full h-12 px-3 bg-surface border border-outline rounded-xl focus:ring-2 focus:ring-primary focus:outline-none"
                             >
-                                <option value="" disabled>
-                                    Select Account
-                                </option>
-                                {allAccounts.map((a) => (
-                                    <option key={a} value={a}>
-                                        {a}
+                                <option value="">Selecione uma conta</option>
+                                {accounts.map((acc) => (
+                                    <option key={acc.$id} value={acc.$id}>
+                                        {acc.name} - {acc.balance.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                                     </option>
                                 ))}
                             </select>
+                        </div>
+
+                        {/* Credit Card Selection - Only show if transaction is credit card and account is selected */}
+                        {newTransaction.type === "credit" && newTransaction.accountId && availableCreditCards.length > 0 && (
+                            <div>
+                                <label htmlFor="creditCard" className="block text-sm font-medium text-on-surface-variant mb-1">
+                                    Cartão de Crédito (opcional)
+                                </label>
+                                <select
+                                    id="creditCard"
+                                    name="creditCard"
+                                    value={newTransaction.creditCardId}
+                                    onChange={(e) => setNewTransaction({ ...newTransaction, creditCardId: e.target.value })}
+                                    className="w-full h-12 px-3 bg-surface border border-outline rounded-xl focus:ring-2 focus:ring-primary focus:outline-none"
+                                >
+                                    <option value="">Nenhum cartão</option>
+                                    {availableCreditCards.map((card) => (
+                                        <option key={card.$id} value={card.$id}>
+                                            {card.name} - **** {card.last_digits}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+                        
+                        {/* Category Selection */}
+                        <div>
+                            <label htmlFor="category" className="block text-sm font-medium text-on-surface-variant mb-1">
+                                Categoria *
+                            </label>
                             <select
+                                id="category"
                                 name="category"
                                 value={newTransaction.category}
                                 onChange={(e) => setNewTransaction({ ...newTransaction, category: e.target.value })}
                                 required
                                 className="w-full h-12 px-3 bg-surface border border-outline rounded-xl focus:ring-2 focus:ring-primary focus:outline-none"
                             >
-                                <option value="" disabled>
-                                    Select Category
-                                </option>
+                                <option value="">Selecione uma categoria</option>
                                 {allCategories.map((c) => (
                                     <option key={c} value={c}>
                                         {c}
@@ -605,20 +670,29 @@ const TransactionsScreen: React.FC<{
                                 ))}
                             </select>
                         </div>
-                        <select
-                            name="type"
-                            value={newTransaction.type}
-                            onChange={(e) =>
-                                setNewTransaction({ ...newTransaction, type: e.target.value as TransactionType })
-                            }
-                            required
-                            className="w-full h-12 px-3 bg-surface border border-outline rounded-xl focus:ring-2 focus:ring-primary focus:outline-none"
-                        >
-                            <option value="credit">Credit Card</option>
-                            <option value="debit">Debit</option>
-                            <option value="pix">Pix</option>
-                            <option value="boleto">Boleto</option>
-                        </select>
+                        
+                        {/* Transaction Type Selection */}
+                        <div>
+                            <label htmlFor="type" className="block text-sm font-medium text-on-surface-variant mb-1">
+                                Tipo de Pagamento *
+                            </label>
+                            <select
+                                id="type"
+                                name="type"
+                                value={newTransaction.type}
+                                onChange={(e) =>
+                                    setNewTransaction({ ...newTransaction, type: e.target.value as TransactionType })
+                                }
+                                required
+                                className="w-full h-12 px-3 bg-surface border border-outline rounded-xl focus:ring-2 focus:ring-primary focus:outline-none"
+                            >
+                                <option value="credit">Credit Card</option>
+                                <option value="debit">Debit</option>
+                                <option value="pix">Pix</option>
+                                <option value="boleto">Boleto</option>
+                            </select>
+                        </div>
+                        
                         <textarea
                             id="notes"
                             placeholder="Notes (optional)"

@@ -11,6 +11,8 @@ import { migration as createUserPreferencesTable } from './20250123_000004_creat
 import { migration as createUserSettingsTable } from './20250123_000005_create_user_settings_table';
 import { migration as syncSchemaWithAppwriteSchema } from './20251022_000006_sync_schema_with_appwrite_schema';
 import { migration as createTransactionsTable } from './20251022_000007_create_transactions_table';
+import { migration as createAccountsTable } from './20251022_000008_create_accounts_table';
+import { migration as createCreditCardsTable } from './20251022_000009_create_credit_cards_table';
 
 /**
  * All migrations in order of execution
@@ -25,4 +27,6 @@ export const migrations: Migration[] = [
   createUserSettingsTable,
   syncSchemaWithAppwriteSchema,
   createTransactionsTable,
+  createAccountsTable,
+  createCreditCardsTable,
 ];

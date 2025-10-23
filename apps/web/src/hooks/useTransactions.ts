@@ -14,6 +14,7 @@ interface ApiTransaction {
   currency?: string;
   source?: 'manual' | 'integration' | 'import';
   accountId?: string;
+  creditCardId?: string;
   merchant?: string;
   integrationId?: string;
   tags?: string[];
@@ -117,6 +118,7 @@ export async function createTransaction(data: {
   date: string;
   currency?: string;
   accountId?: string;
+  creditCardId?: string;
   merchant?: string;
   tags?: string[];
 }): Promise<ApiTransaction> {
