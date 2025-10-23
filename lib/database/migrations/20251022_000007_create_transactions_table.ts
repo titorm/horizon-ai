@@ -46,7 +46,7 @@ export const migration: Migration = {
     console.log('Creating 8 essential columns...');
 
     // Column 1: user_id - Reference to user (indexed for queries)
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: 'transactions',
       key: 'user_id',
@@ -55,7 +55,7 @@ export const migration: Migration = {
     });
 
     // Column 2: amount - Transaction amount
-    await databases.createFloatColumn({
+    await createFloatColumn({
       databaseId,
       collectionId: 'transactions',
       key: 'amount',
@@ -63,7 +63,7 @@ export const migration: Migration = {
     });
 
     // Column 3: type - income, expense, transfer (indexed for queries)
-    await databases.createEnumColumn({
+    await createEnumColumn({
       databaseId,
       collectionId: 'transactions',
       key: 'type',
@@ -72,7 +72,7 @@ export const migration: Migration = {
     });
 
     // Column 4: date - Transaction date (indexed for queries)
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: 'transactions',
       key: 'date',
@@ -80,7 +80,7 @@ export const migration: Migration = {
     });
 
     // Column 5: status - pending, completed, failed, cancelled (indexed for queries)
-    await databases.createEnumColumn({
+    await createEnumColumn({
       databaseId,
       collectionId: 'transactions',
       key: 'status',
@@ -93,7 +93,7 @@ export const migration: Migration = {
     // integration_id, integration_data, tags, location, receipt_url,
     // is_recurring, recurring_pattern
     console.log('Creating data column (JSON) for all other fields...');
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: 'transactions',
       key: 'data',
@@ -102,7 +102,7 @@ export const migration: Migration = {
     });
 
     // Column 7: created_at
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: 'transactions',
       key: 'created_at',
@@ -110,7 +110,7 @@ export const migration: Migration = {
     });
 
     // Column 8: updated_at
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: 'transactions',
       key: 'updated_at',
@@ -120,7 +120,7 @@ export const migration: Migration = {
     console.log('Creating indexes...');
 
     // Index 1: user_id for fast user queries
-    await databases.createIndex({
+    await createIndex({
       databaseId,
       collectionId: 'transactions',
       key: 'idx_user_id',
@@ -130,7 +130,7 @@ export const migration: Migration = {
     });
 
     // Index 2: date for temporal queries
-    await databases.createIndex({
+    await createIndex({
       databaseId,
       collectionId: 'transactions',
       key: 'idx_date',
@@ -140,7 +140,7 @@ export const migration: Migration = {
     });
 
     // Index 3: type for income/expense filtering
-    await databases.createIndex({
+    await createIndex({
       databaseId,
       collectionId: 'transactions',
       key: 'idx_type',
@@ -149,7 +149,7 @@ export const migration: Migration = {
     });
 
     // Index 4: status for filtering by transaction status
-    await databases.createIndex({
+    await createIndex({
       databaseId,
       collectionId: 'transactions',
       key: 'idx_status',

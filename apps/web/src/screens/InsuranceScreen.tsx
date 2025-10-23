@@ -1,7 +1,7 @@
 import React from "react";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import Badge from "../components/ui/Badge";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import Badge from "@/components/ui/Badge";
 import { MOCK_INSURANCE_POLICIES } from "../constants";
 import type { InsurancePolicy } from "../types";
 import { PlusIcon, ShieldIcon, HomeIcon, CarIcon } from "../assets/Icons";

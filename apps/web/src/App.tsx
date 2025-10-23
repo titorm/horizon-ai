@@ -6,7 +6,7 @@ import WelcomeScreen from "./screens/WelcomeScreen";
 import BankSelectionScreen from "./screens/BankSelectionScreen";
 import SecurityInterstitialScreen from "./screens/SecurityInterstitialScreen";
 import LoadingScreen from "./screens/LoadingScreen";
-import DashboardLayout from "./components/layout/DashboardLayout";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import Toast from "./components/ui/Toast";
 
 import SuccessionScreen from "./screens/SuccessionScreen";

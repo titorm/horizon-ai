@@ -1,7 +1,7 @@
 import React from "react";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import Badge from "../components/ui/Badge";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import Badge from "@/components/ui/Badge";
 import { MOCK_INVOICES } from "../constants";
 // FIX: Import InvoiceStatus to strongly type the statusVariant map.
 import type { Invoice, UserRole, InvoiceStatus } from "../types";

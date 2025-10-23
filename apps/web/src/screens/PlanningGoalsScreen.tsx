@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { GoogleGenAI, Type } from "@google/genai";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import Modal from "../components/ui/Modal";
-import Input from "../components/ui/Input";
-import Spinner from "../components/ui/Spinner";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import Modal from "@/components/ui/Modal";
+import Input from "@/components/ui/Input";
+import Spinner from "@/components/ui/Spinner";
 import {
     MOCK_FINANCIAL_GOALS,
     MOCK_RETIREMENT_GOAL,

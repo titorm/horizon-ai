@@ -26,7 +26,7 @@ export const migration: Migration = {
     console.log('Creating columns...');
 
     // user_id - Foreign key to users table
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: 'user_profiles',
       key: 'user_id',
@@ -35,7 +35,7 @@ export const migration: Migration = {
     });
 
     // bio
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: 'user_profiles',
       key: 'bio',
@@ -52,7 +52,7 @@ export const migration: Migration = {
     });
 
     // phone
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: 'user_profiles',
       key: 'phone',
@@ -61,7 +61,7 @@ export const migration: Migration = {
     });
 
     // address - JSON string
-    await databases.createStringColumn({
+    await createStringColumn({
       databaseId,
       collectionId: 'user_profiles',
       key: 'address',
@@ -70,7 +70,7 @@ export const migration: Migration = {
     });
 
     // birthdate
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: 'user_profiles',
       key: 'birthdate',
@@ -78,7 +78,7 @@ export const migration: Migration = {
     });
 
     // created_at
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: 'user_profiles',
       key: 'created_at',
@@ -86,7 +86,7 @@ export const migration: Migration = {
     });
 
     // updated_at
-    await databases.createDatetimeColumn({
+    await createDatetimeColumn({
       databaseId,
       collectionId: 'user_profiles',
       key: 'updated_at',
@@ -96,7 +96,7 @@ export const migration: Migration = {
     console.log('Creating indexes...');
 
     // Create unique index on user_id
-    await databases.createIndex({
+    await createIndex({
       databaseId,
       collectionId: 'user_profiles',
       key: 'idx_user_id',

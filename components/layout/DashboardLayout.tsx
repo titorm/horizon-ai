@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import {
     HomeIcon,
@@ -16,26 +17,27 @@ import {
     ShieldIcon,
     ShoppingCartIcon,
 } from "../../assets/Icons";
-import Modal from "../ui/Modal";
-import type { Screen, User } from "../../types";
+import Modal from "@/components/ui/Modal";
+import type { User } from "@/lib/types";
+import Link from "next/link";
 
 interface NavItemProps {
     icon: React.ReactNode;
     label: string;
     isActive: boolean;
-    onClick: () => void;
+    href: string;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ icon, label, isActive, onClick }) => {
+const NavItem: React.FC<NavItemProps> = ({ icon, label, isActive, href }) => {
     return (
-        <button
-            onClick={onClick}
+        <Link
+            href={href}
             className={`w-full flex items-center p-2.5 rounded-lg text-sm font-medium transition-colors
         ${isActive ? "bg-primary-container text-primary" : "text-on-surface-variant hover:bg-on-surface/5"}`}
         >
             <div className="mr-3">{icon}</div>
             {label}
-        </button>
+        </Link>
     );
 };
 
@@ -48,8 +50,7 @@ const NavSection: React.FC<{ title: string }> = ({ title }) => (
 interface DashboardLayoutProps {
     children: React.ReactNode;
     user: User;
-    activeScreen: Screen;
-    onNavigate: (screen: Screen) => void;
+    activeScreen: string;
     onLogout: () => void;
 }
 
@@ -57,7 +58,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     children, 
     user, 
     activeScreen, 
-    onNavigate, 
     onLogout
 }) => {
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
@@ -112,7 +112,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                                 key={item.id}
                                 {...item}
                                 isActive={activeScreen === item.id}
-                                onClick={() => onNavigate(item.id as Screen)}
+                                href={`/${item.id}`}
                             />
                         ))}
                     </nav>
@@ -124,7 +124,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                                 key={item.id}
                                 {...item}
                                 isActive={activeScreen === item.id}
-                                onClick={() => onNavigate(item.id as Screen)}
+                                href={`/${item.id}`}
                             />
                         ))}
                     </nav>
@@ -136,7 +136,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                                 key={item.id}
                                 {...item}
                                 isActive={activeScreen === item.id}
-                                onClick={() => onNavigate(item.id as Screen)}
+                                href={`/${item.id}`}
                             />
                         ))}
                     </nav>
@@ -148,7 +148,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                                 key={item.id}
                                 {...item}
                                 isActive={activeScreen === item.id}
-                                onClick={() => onNavigate(item.id as Screen)}
+                                href={`/${item.id}`}
                             />
                         ))}
                     </nav>
@@ -172,15 +172,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                                 key={item.id}
                                 {...item}
                                 isActive={activeScreen === item.id}
-                                onClick={() => onNavigate(item.id as Screen)}
+                                href={`/${item.id}`}
                             />
                         ))}
-                        <NavItem
-                            label="Log Out"
-                            icon={<LogOutIcon className="w-5 h-5" />}
-                            isActive={false}
+                        <button
                             onClick={handleLogoutClick}
-                        />
+                            className={`w-full flex items-center p-2.5 rounded-lg text-sm font-medium transition-colors text-on-surface-variant hover:bg-on-surface/5`}
+                        >
+                            <div className="mr-3"><LogOutIcon className="w-5 h-5" /></div>
+                            Log Out
+                        </button>
                     </nav>
                 </div>
             </aside>

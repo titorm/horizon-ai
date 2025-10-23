@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Spinner from "../components/ui/Spinner";
+import Spinner from "@/components/ui/Spinner";
 
 const messages = [
     "Connecting securely...",

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
 import { DotsVerticalIcon, PlusIcon, WalletIcon, CreditCardIcon } from "../assets/Icons";
-import Skeleton from "../components/ui/Skeleton";
-import { DropdownMenu, DropdownMenuItem } from "../components/ui/DropdownMenu";
+import Skeleton from "@/components/ui/Skeleton";
+import { DropdownMenu, DropdownMenuItem } from "@/components/ui/DropdownMenu";
 import { useAccounts } from "../hooks/useAccounts";
 import { useTotalBalance } from "../hooks/useTotalBalance";
 import { AddAccountModal } from "../components/modals/AddAccountModal";

@@ -25,7 +25,7 @@ export const DropdownMenuItem: React.FC<DropdownMenuItemProps>
 
 ### 2. Total Balance no Header do Dashboard
 
-**Localização**: `apps/web/src/components/layout/DashboardLayout.tsx`
+**Localização**: `components/layout/DashboardLayout.tsx`
 
 **Mudanças**:
 - ✅ Adicionado header fixo no topo do conteúdo principal
@@ -216,7 +216,7 @@ creditCards: {
    - Substituído botão de delete por dropdown menu
    - Adicionadas opções "Integrar" e "Excluir"
 
-2. ✅ `apps/web/src/components/layout/DashboardLayout.tsx`
+2. ✅ `components/layout/DashboardLayout.tsx`
    - Adicionado header com Total Balance
    - Aceita prop `totalBalance`
 

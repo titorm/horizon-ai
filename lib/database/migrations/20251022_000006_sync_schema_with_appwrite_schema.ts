@@ -1,4 +1,4 @@
-import { IndexType } from 'node-appwrite';
+import { IndexType, createStringColumn, createBooleanColumn, createDatetimeColumn, createIndex, createIntegerColumn } from 'node-appwrite';
 
 import { Migration, MigrationContext } from './migration.interface';
 
@@ -26,7 +26,7 @@ export const migration: Migration = {
 
     // USERS table adjustments
     await safe(async () => {
-      await databases.createStringColumn({
+      await createStringColumn({
         databaseId,
         collectionId: 'users',
         key: 'password_hash',
@@ -36,20 +36,20 @@ export const migration: Migration = {
     }, 'users.password_hash');
 
     await safe(async () => {
-      await databases.createBooleanColumn({ databaseId, collectionId: 'users', key: 'is_email_verified', required: true });
+      await createBooleanColumn({ databaseId, collectionId: 'users', key: 'is_email_verified', required: true });
     }, 'users.is_email_verified');
 
     await safe(async () => {
-      await databases.createBooleanColumn({ databaseId, collectionId: 'users', key: 'is_active', required: true });
+      await createBooleanColumn({ databaseId, collectionId: 'users', key: 'is_active', required: true });
     }, 'users.is_active');
 
     await safe(async () => {
-      await databases.createDatetimeColumn({ databaseId, collectionId: 'users', key: 'last_login_at', required: false });
+      await createDatetimeColumn({ databaseId, collectionId: 'users', key: 'last_login_at', required: false });
     }, 'users.last_login_at');
 
     // Ensure index on email exists
     await safe(async () => {
-      await databases.createIndex({
+      await createIndex({
         databaseId,
         collectionId: 'users',
         key: 'email_idx',
@@ -63,7 +63,7 @@ export const migration: Migration = {
       {
         key: 'first_name',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_profiles',
             key: 'first_name',
@@ -74,7 +74,7 @@ export const migration: Migration = {
       {
         key: 'last_name',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_profiles',
             key: 'last_name',
@@ -85,7 +85,7 @@ export const migration: Migration = {
       {
         key: 'display_name',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_profiles',
             key: 'display_name',
@@ -96,7 +96,7 @@ export const migration: Migration = {
       {
         key: 'avatar_url',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_profiles',
             key: 'avatar_url',
@@ -107,7 +107,7 @@ export const migration: Migration = {
       {
         key: 'phone_number',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_profiles',
             key: 'phone_number',
@@ -118,7 +118,7 @@ export const migration: Migration = {
       {
         key: 'date_of_birth',
         fn: () =>
-          databases.createDatetimeColumn({
+          createDatetimeColumn({
             databaseId,
             collectionId: 'user_profiles',
             key: 'date_of_birth',
@@ -128,7 +128,7 @@ export const migration: Migration = {
       {
         key: 'address',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_profiles',
             key: 'address',
@@ -139,7 +139,7 @@ export const migration: Migration = {
       {
         key: 'bio',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_profiles',
             key: 'bio',
@@ -150,7 +150,7 @@ export const migration: Migration = {
       {
         key: 'occupation',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_profiles',
             key: 'occupation',
@@ -161,7 +161,7 @@ export const migration: Migration = {
       {
         key: 'company',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_profiles',
             key: 'company',
@@ -172,7 +172,7 @@ export const migration: Migration = {
       {
         key: 'website',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_profiles',
             key: 'website',
@@ -183,7 +183,7 @@ export const migration: Migration = {
       {
         key: 'social_links',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_profiles',
             key: 'social_links',
@@ -199,7 +199,7 @@ export const migration: Migration = {
     }
 
     await safe(async () => {
-      await databases.createIndex({
+      await createIndex({
         databaseId,
         collectionId: 'user_profiles',
         key: 'user_id_idx',
@@ -213,7 +213,7 @@ export const migration: Migration = {
       {
         key: 'theme',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_preferences',
             key: 'theme',
@@ -224,7 +224,7 @@ export const migration: Migration = {
       {
         key: 'language',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_preferences',
             key: 'language',
@@ -235,7 +235,7 @@ export const migration: Migration = {
       {
         key: 'currency',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_preferences',
             key: 'currency',
@@ -246,7 +246,7 @@ export const migration: Migration = {
       {
         key: 'default_dashboard_view',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_preferences',
             key: 'default_dashboard_view',
@@ -257,7 +257,7 @@ export const migration: Migration = {
       {
         key: 'dashboard_widgets',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_preferences',
             key: 'dashboard_widgets',
@@ -268,7 +268,7 @@ export const migration: Migration = {
       {
         key: 'email_notifications',
         fn: () =>
-          databases.createBooleanColumn({
+          createBooleanColumn({
             databaseId,
             collectionId: 'user_preferences',
             key: 'email_notifications',
@@ -278,7 +278,7 @@ export const migration: Migration = {
       {
         key: 'push_notifications',
         fn: () =>
-          databases.createBooleanColumn({
+          createBooleanColumn({
             databaseId,
             collectionId: 'user_preferences',
             key: 'push_notifications',
@@ -288,7 +288,7 @@ export const migration: Migration = {
       {
         key: 'sms_notifications',
         fn: () =>
-          databases.createBooleanColumn({
+          createBooleanColumn({
             databaseId,
             collectionId: 'user_preferences',
             key: 'sms_notifications',
@@ -298,7 +298,7 @@ export const migration: Migration = {
       {
         key: 'notification_frequency',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_preferences',
             key: 'notification_frequency',
@@ -309,7 +309,7 @@ export const migration: Migration = {
       {
         key: 'show_balances',
         fn: () =>
-          databases.createBooleanColumn({
+          createBooleanColumn({
             databaseId,
             collectionId: 'user_preferences',
             key: 'show_balances',
@@ -319,7 +319,7 @@ export const migration: Migration = {
       {
         key: 'auto_categorization_enabled',
         fn: () =>
-          databases.createBooleanColumn({
+          createBooleanColumn({
             databaseId,
             collectionId: 'user_preferences',
             key: 'auto_categorization_enabled',
@@ -329,7 +329,7 @@ export const migration: Migration = {
       {
         key: 'budget_alerts',
         fn: () =>
-          databases.createBooleanColumn({
+          createBooleanColumn({
             databaseId,
             collectionId: 'user_preferences',
             key: 'budget_alerts',
@@ -339,7 +339,7 @@ export const migration: Migration = {
       {
         key: 'profile_visibility',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_preferences',
             key: 'profile_visibility',
@@ -350,7 +350,7 @@ export const migration: Migration = {
       {
         key: 'share_data_for_insights',
         fn: () =>
-          databases.createBooleanColumn({
+          createBooleanColumn({
             databaseId,
             collectionId: 'user_preferences',
             key: 'share_data_for_insights',
@@ -365,7 +365,7 @@ export const migration: Migration = {
     }
 
     await safe(async () => {
-      await databases.createIndex({
+      await createIndex({
         databaseId,
         collectionId: 'user_preferences',
         key: 'user_id_idx',
@@ -379,7 +379,7 @@ export const migration: Migration = {
       {
         key: 'two_factor_enabled',
         fn: () =>
-          databases.createBooleanColumn({
+          createBooleanColumn({
             databaseId,
             collectionId: 'user_settings',
             key: 'two_factor_enabled',
@@ -389,7 +389,7 @@ export const migration: Migration = {
       {
         key: 'two_factor_method',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_settings',
             key: 'two_factor_method',
@@ -400,7 +400,7 @@ export const migration: Migration = {
       {
         key: 'session_timeout',
         fn: () =>
-          databases.createIntegerColumn({
+          createIntegerColumn({
             databaseId,
             collectionId: 'user_settings',
             key: 'session_timeout',
@@ -412,7 +412,7 @@ export const migration: Migration = {
       {
         key: 'password_last_changed_at',
         fn: () =>
-          databases.createDatetimeColumn({
+          createDatetimeColumn({
             databaseId,
             collectionId: 'user_settings',
             key: 'password_last_changed_at',
@@ -422,7 +422,7 @@ export const migration: Migration = {
       {
         key: 'auto_sync_enabled',
         fn: () =>
-          databases.createBooleanColumn({
+          createBooleanColumn({
             databaseId,
             collectionId: 'user_settings',
             key: 'auto_sync_enabled',
@@ -432,7 +432,7 @@ export const migration: Migration = {
       {
         key: 'sync_frequency',
         fn: () =>
-          databases.createIntegerColumn({
+          createIntegerColumn({
             databaseId,
             collectionId: 'user_settings',
             key: 'sync_frequency',
@@ -444,7 +444,7 @@ export const migration: Migration = {
       {
         key: 'cloud_backup_enabled',
         fn: () =>
-          databases.createBooleanColumn({
+          createBooleanColumn({
             databaseId,
             collectionId: 'user_settings',
             key: 'cloud_backup_enabled',
@@ -454,7 +454,7 @@ export const migration: Migration = {
       {
         key: 'connected_banks',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_settings',
             key: 'connected_banks',
@@ -465,7 +465,7 @@ export const migration: Migration = {
       {
         key: 'connected_apps',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_settings',
             key: 'connected_apps',
@@ -476,12 +476,12 @@ export const migration: Migration = {
       {
         key: 'beta_features',
         fn: () =>
-          databases.createBooleanColumn({ databaseId, collectionId: 'user_settings', key: 'beta_features', required: true }),
+          createBooleanColumn({ databaseId, collectionId: 'user_settings', key: 'beta_features', required: true }),
       },
       {
         key: 'analytics_opt_in',
         fn: () =>
-          databases.createBooleanColumn({
+          createBooleanColumn({
             databaseId,
             collectionId: 'user_settings',
             key: 'analytics_opt_in',
@@ -491,7 +491,7 @@ export const migration: Migration = {
       {
         key: 'custom_settings',
         fn: () =>
-          databases.createStringColumn({
+          createStringColumn({
             databaseId,
             collectionId: 'user_settings',
             key: 'custom_settings',
@@ -507,7 +507,7 @@ export const migration: Migration = {
     }
 
     await safe(async () => {
-      await databases.createIndex({
+      await createIndex({
         databaseId,
         collectionId: 'user_settings',
         key: 'user_id_idx',
@@ -517,7 +517,7 @@ export const migration: Migration = {
     }, 'user_settings.user_id_idx');
 
     await safe(async () => {
-      await databases.createIndex({
+      await createIndex({
         databaseId,
         collectionId: 'user_settings',
         key: 'two_factor_enabled_idx',

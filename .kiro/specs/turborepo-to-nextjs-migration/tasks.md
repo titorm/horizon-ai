@@ -171,14 +171,14 @@
   - Retornar estatísticas de transações do usuário
   - _Requirements: 3.1_
 
-- [ ] 14. Migrar componentes UI
+- [x] 14. Migrar componentes UI
   - Criar components/ui/ e migrar todos os componentes de apps/web/src/components/ui
   - Migrar Button, Card, Input, Modal, Toast, Badge, Tabs, Stepper, Spinner, Skeleton, DropdownMenu
   - Atualizar imports para usar '@/components/ui'
   - Garantir compatibilidade com Server e Client Components
   - _Requirements: 9.1_
 
-- [ ] 15. Migrar componentes de layout
+- [x] 15. Migrar componentes de layout
   - Criar components/layout/ e migrar DashboardLayout, Header, Sidebar, Footer
   - Adaptar DashboardLayout para receber user como prop
   - Atualizar navegação para usar Next.js Link e useRouter

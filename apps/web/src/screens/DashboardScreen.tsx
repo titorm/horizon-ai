@@ -1,6 +1,6 @@
 import React from "react";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
 import { MOCK_BALANCE, MOCK_TRANSACTIONS } from "../constants";
 import type { Transaction } from "../types";
 

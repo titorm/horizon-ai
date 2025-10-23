@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { GoogleGenAI } from "@google/genai";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
 import { MOCK_TAX_ASSETS, MOCK_TAX_INCOMES } from "../constants";
 import type { TaxAsset, TaxIncome, UserRole } from "../types";
 import { AlertTriangleIcon, PlusIcon, SparklesIcon } from "../assets/Icons";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/Tabs";
-import Spinner from "../components/ui/Spinner";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
+import Spinner from "@/components/ui/Spinner";
 
 const formatBRL = (value: number) => {
     return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

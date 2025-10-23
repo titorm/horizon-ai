@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { GoogleGenAI, Type } from "@google/genai";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/Tabs";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import Input from "../components/ui/Input";
-import Spinner from "../components/ui/Spinner";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Spinner from "@/components/ui/Spinner";
 import { MOCK_SHOPPING_LISTS, MOCK_PURCHASE_HISTORY } from "../constants";
 import type { ShoppingList, ShoppingListItem, PurchaseRecord, PurchasedItem } from "../types";
 import { SparklesIcon, PlusIcon, QrCodeIcon } from "../assets/Icons";

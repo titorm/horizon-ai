@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import Card from "../components/ui/Card";
+import Card from "@/components/ui/Card";
 import { MOCK_CATEGORIES } from "../constants";
 import type { Category } from "../types";
-import Button from "../components/ui/Button";
+import Button from "@/components/ui/Button";
 import { SettingsIcon } from "../assets/Icons";
 import ManageCategoriesModal from "./ManageCategoriesModal";
 
