@@ -191,7 +191,7 @@
   - Adaptar para Client Components
   - _Requirements: 9.3_
 
-- [ ] 17. Migrar assets e ícones
+- [x] 17. Migrar assets e ícones
   - Criar components/assets/ e migrar BankLogos.tsx, Icons.tsx
   - Copiar arquivos estáticos para public/assets/
   - Atualizar referências de imagens

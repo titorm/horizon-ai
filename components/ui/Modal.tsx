@@ -1,6 +1,7 @@
+"use client";
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { XIcon } from "../../assets/Icons";
+import { XIcon } from "@/components/assets/Icons";
 
 interface ModalProps {
     isOpen: boolean;

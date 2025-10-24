@@ -5,7 +5,7 @@ import Badge from "@/components/ui/Badge";
 import { MOCK_INVOICES } from "../constants";
 // FIX: Import InvoiceStatus to strongly type the statusVariant map.
 import type { Invoice, UserRole, InvoiceStatus } from "../types";
-import { UploadCloudIcon, AlertTriangleIcon } from "../assets/Icons";
+import { UploadCloudIcon, AlertTriangleIcon } from "@/components/assets/Icons";
 
 const InvoiceItem: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
     // FIX: Explicitly type the statusVariant object to prevent type inference errors with the Badge component's variant prop.

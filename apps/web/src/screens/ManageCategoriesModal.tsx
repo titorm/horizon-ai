@@ -4,7 +4,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { AVAILABLE_CATEGORY_ICONS } from "../constants";
 import type { Category } from "../types";
-import { CheckCircleIcon, XIcon, CheckIcon } from "../assets/Icons";
+import { CheckCircleIcon, XIcon, CheckIcon } from "@/components/assets/Icons";
 
 type IconComponent = React.FC<{ className?: string }>;
 

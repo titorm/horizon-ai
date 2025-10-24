@@ -6,7 +6,7 @@ import Modal from "@/components/ui/Modal";
 import Input from "@/components/ui/Input";
 import { MOCK_BENEFICIARIES } from "../constants";
 import type { Beneficiary } from "../types";
-import { UsersIcon, PlusIcon, EditIcon, Trash2Icon } from "../assets/Icons";
+import { UsersIcon, PlusIcon, EditIcon, Trash2Icon } from "@/components/assets/Icons";
 
 const BeneficiaryRow: React.FC<{ beneficiary: Beneficiary; onEdit: () => void; onDelete: () => void }> = ({
     beneficiary,

@@ -3,7 +3,7 @@ import Card from "@/components/ui/Card";
 import { MOCK_CATEGORIES } from "../constants";
 import type { Category } from "../types";
 import Button from "@/components/ui/Button";
-import { SettingsIcon } from "../assets/Icons";
+import { SettingsIcon } from "@/components/assets/Icons";
 import ManageCategoriesModal from "./ManageCategoriesModal";
 
 const CategoryItem: React.FC<{ category: Category }> = ({ category }) => {

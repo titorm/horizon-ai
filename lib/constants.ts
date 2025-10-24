@@ -509,21 +509,21 @@ export const MOCK_SHOPPING_LISTS: ShoppingList[] = [
   },
 ];
 
-export const MOCK_PURCHASE_HISTORY: PurchaseRecord[] = [
-  {
-    $id: 'pr-1',
-    storeName: 'Pão de Açúcar',
-    purchaseDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
-    totalAmount: 412.8,
-    nfeUrl: 'http://example.com/nfe1',
-    items: [
-      { name: 'Leite Integral Qualitá', brand: 'Qualitá', quantity: 12, unitPrice: 4.5, totalPrice: 54.0 },
-      { name: 'Pão de Forma Pullman', brand: 'Pullman', quantity: 2, unitPrice: 8.0, totalPrice: 16.0 },
-      { name: 'Café em Pó 3 Corações', brand: '3 Corações', quantity: 1, unitPrice: 18.5, totalPrice: 18.5 },
-      { name: 'Contra Filé Friboi (kg)', brand: 'Friboi', quantity: 1.5, unitPrice: 55.0, totalPrice: 82.5 },
-    ],
-  },
-];
+// export const MOCK_PURCHASE_HISTORY: PurchaseRecord[] = [
+//     {
+//         $id: "pr-1",
+//         storeName: "Pão de Açúcar",
+//         purchaseDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+//         totalAmount: 412.8,
+//         nfeUrl: "http://example.com/nfe1",
+//         items: [
+//             { name: "Leite Integral Qualitá", brand: "Qualitá", quantity: 12, unitPrice: 4.5, totalPrice: 54.0 },
+//             { name: "Pão de Forma Pullman", brand: "Pullman", quantity: 2, unitPrice: 8.0, totalPrice: 16.0 },
+//             { name: "Café em Pó 3 Corações", brand: "3 Corações", quantity: 1, unitPrice: 18.5, totalPrice: 18.5 },
+//             { name: "Contra Filé Friboi (kg)", brand: "Friboi", quantity: 1.5, unitPrice: 55.0, totalPrice: 82.5 },
+//         ],
+//     },
+// ];
 
 export const MOCK_BENEFICIARIES: Beneficiary[] = [
   { $id: '1', name: 'Carlos Silva', relationship: 'Spouse', allocation: '50% of investments', status: 'Confirmed' },

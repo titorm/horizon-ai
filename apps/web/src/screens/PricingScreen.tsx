@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import { CheckCircleIcon } from "../assets/Icons";
+import { CheckCircleIcon } from "@/components/assets/Icons";
 
 interface PricingScreenProps {
     onSelectPlan: () => void;

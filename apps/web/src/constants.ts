@@ -1,4 +1,4 @@
-import { BbLogo, BradescoLogo, InterLogo, ItauLogo, NubankLogo, SantanderLogo } from "./assets/BankLogos";
+import { BbLogo, BradescoLogo, InterLogo, ItauLogo, NubankLogo, SantanderLogo } from "@/components/assets/BankLogos";
 import type { FC } from "react";
 import {
     BriefcaseIcon,
@@ -15,7 +15,7 @@ import {
     TrendingUpIcon,
     UsersIcon,
     UtensilsIcon,
-} from "./assets/Icons";
+} from "@/components/assets/Icons";
 import type {
     Bank,
     Beneficiary,

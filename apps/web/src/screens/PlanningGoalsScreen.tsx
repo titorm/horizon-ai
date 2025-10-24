@@ -24,7 +24,7 @@ import {
     Trash2Icon,
     TrendingUpIcon,
     SparklesIcon,
-} from "../assets/Icons";
+} from "@/components/assets/Icons";
 
 const formatCurrency = (value: number) => {
     return value.toLocaleString("pt-BR", {

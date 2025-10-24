@@ -3,7 +3,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { MOCK_INTEGRATIONS } from "../constants";
 import type { Integration, IntegrationCategory } from "../types";
-import { CheckIcon } from "../assets/Icons";
+import { CheckIcon } from "@/components/assets/Icons";
 
 const IntegrationCard: React.FC<{ integration: Integration }> = ({ integration }) => {
     const { name, description, logo: Logo, connected } = integration;

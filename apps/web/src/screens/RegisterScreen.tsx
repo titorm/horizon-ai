@@ -2,7 +2,7 @@ import React from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Card from "@/components/ui/Card";
-import { ArrowLeftIcon } from "../assets/Icons";
+import { ArrowLeftIcon } from "@/components/assets/Icons";
 
 interface RegisterScreenProps {
     onRegister: (email: string, password: string, firstName: string, lastName?: string) => void;

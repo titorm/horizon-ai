@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import { DotsVerticalIcon, PlusIcon, WalletIcon, CreditCardIcon } from "../assets/Icons";
+import { DotsVerticalIcon, PlusIcon, WalletIcon, CreditCardIcon } from "@/components/assets/Icons";
 import Skeleton from "@/components/ui/Skeleton";
 import { DropdownMenu, DropdownMenuItem } from "@/components/ui/DropdownMenu";
 import { useAccounts } from "../hooks/useAccounts";

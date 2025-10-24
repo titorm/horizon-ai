@@ -16,7 +16,7 @@ import {
     ReceiptIcon,
     ShieldIcon,
     ShoppingCartIcon,
-} from "../../assets/Icons";
+} from "@/components/assets/Icons";
 import Modal from "@/components/ui/Modal";
 import type { User } from "@/lib/types";
 import Link from "next/link";

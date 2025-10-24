@@ -4,7 +4,7 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { MOCK_INSURANCE_POLICIES } from "../constants";
 import type { InsurancePolicy } from "../types";
-import { PlusIcon, ShieldIcon, HomeIcon, CarIcon } from "../assets/Icons";
+import { PlusIcon, ShieldIcon, HomeIcon, CarIcon } from "@/components/assets/Icons";
 
 const formatCurrency = (value: number) => {
     return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

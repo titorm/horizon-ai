@@ -1,6 +1,6 @@
 import React from "react";
 import Button from "@/components/ui/Button";
-import { LockIcon } from "../assets/Icons";
+import { LockIcon } from "@/components/assets/Icons";
 
 interface SecurityInterstitialScreenProps {
     bankName: string;

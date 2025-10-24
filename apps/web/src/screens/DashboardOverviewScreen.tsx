@@ -14,7 +14,7 @@ import {
     TrendingDownIcon,
     TrendingUpIcon,
     SwapIcon,
-} from "../assets/Icons";
+} from "@/components/assets/Icons";
 import Skeleton from "@/components/ui/Skeleton";
 import { useTransactions } from "../hooks/useTransactions";
 import { useFinancialInsights } from "../hooks/useFinancialInsights";

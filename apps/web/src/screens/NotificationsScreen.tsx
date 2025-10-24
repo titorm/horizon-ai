@@ -1,7 +1,7 @@
 import React from "react";
 import { MOCK_NOTIFICATIONS } from "../constants";
 import type { Notification } from "../types";
-import { WarrantyIcon, AlertTriangleIcon, ListIcon } from "../assets/Icons";
+import { WarrantyIcon, AlertTriangleIcon, ListIcon } from "@/components/assets/Icons";
 
 const NOTIFICATION_ICONS = {
     "Warranty Expiring Soon": <WarrantyIcon className="w-6 h-6 text-tertiary" />,

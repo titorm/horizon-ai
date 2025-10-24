@@ -10,7 +10,7 @@ import {
     SparklesIcon,
     CheckCircleIcon,
     LandmarkIcon,
-} from "../assets/Icons";
+} from "@/components/assets/Icons";
 
 interface LandingScreenProps {
     onGetStarted: () => void;

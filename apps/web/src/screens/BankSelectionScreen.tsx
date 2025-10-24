@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { BANKS } from "../constants";
 import type { Bank } from "../types";
-import { ChevronRightIcon, SearchIcon } from "../assets/Icons";
+import { ChevronRightIcon, SearchIcon } from "@/components/assets/Icons";
 
 interface BankSelectionScreenProps {
     onSelectBank: (bank: Bank) => void;

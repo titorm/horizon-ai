@@ -7,7 +7,7 @@ import Input from "@/components/ui/Input";
 import Spinner from "@/components/ui/Spinner";
 import { MOCK_SHOPPING_LISTS, MOCK_PURCHASE_HISTORY } from "../constants";
 import type { ShoppingList, ShoppingListItem, PurchaseRecord, PurchasedItem } from "../types";
-import { SparklesIcon, PlusIcon, QrCodeIcon } from "../assets/Icons";
+import { SparklesIcon, PlusIcon, QrCodeIcon } from "@/components/assets/Icons";
 
 // --- Helper Components ---
 

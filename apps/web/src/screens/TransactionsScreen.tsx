@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { AVAILABLE_CATEGORY_ICONS } from "../constants";
 import type { Transaction, TransactionType } from "../types";
-import { SearchIcon, FilterIcon, SwapIcon, PlusIcon, XIcon } from "../assets/Icons";
+import { SearchIcon, FilterIcon, SwapIcon, PlusIcon, XIcon } from "@/components/assets/Icons";
 import Input from "@/components/ui/Input";
 import Skeleton from "@/components/ui/Skeleton";
 import Card from "@/components/ui/Card";
