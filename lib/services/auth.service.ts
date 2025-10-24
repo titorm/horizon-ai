@@ -1,5 +1,5 @@
 import { getAppwriteAccount } from '@/lib/appwrite/client';
-import { Account, AppwriteException, ID } from 'node-appwrite';
+import { AppwriteException, ID } from 'node-appwrite';
 
 import { UserService } from './user.service';
 
@@ -44,7 +44,7 @@ export async function signUp(data: SignUpData): Promise<AuthResponse> {
     const userId = ID.unique();
     const name = [firstName, lastName].filter(Boolean).join(' ') || email.split('@')[0];
 
-    const user = await account.create(userId, email, password, name);
+    const user = await account.create({ userId, email, password, name });
 
     console.log(`User created successfully in Appwrite Auth: ${user.$id}`);
 
@@ -103,6 +103,7 @@ export async function signUp(data: SignUpData): Promise<AuthResponse> {
 
 /**
  * Sign in an existing user
+ * Server-side authentication using Users API
  */
 export async function signIn(data: SignInData): Promise<AuthResponse> {
   const { email, password } = data;
@@ -110,13 +111,31 @@ export async function signIn(data: SignInData): Promise<AuthResponse> {
   console.log(`Sign in attempt for email: ${email}`);
 
   try {
-    const account = getAppwriteAccount();
+    // Verify password by attempting to create a session with a client (no API key)
+    const { Client, Account } = await import('node-appwrite');
+    const sessionClient = new Client()
+      .setEndpoint(process.env.APPWRITE_ENDPOINT!)
+      .setProject(process.env.APPWRITE_PROJECT_ID!);
 
-    // Create email session in Appwrite
-    const session = await account.createEmailPasswordSession(email, password);
+    const sessionAccount = new Account(sessionClient);
 
-    // Get user details
-    const user = await account.get();
+    let user;
+    try {
+      // Try to create a session to verify credentials
+      await sessionAccount.createEmailPasswordSession({ email, password });
+      // Get user details
+      user = await sessionAccount.get();
+      // Delete the session immediately as we're using JWT instead
+      await sessionAccount.deleteSession('current');
+    } catch (sessionError) {
+      if (sessionError instanceof AppwriteException) {
+        if (sessionError.code === 401) {
+          throw new Error('Invalid email or password');
+        }
+        throw new Error(sessionError.message);
+      }
+      throw sessionError;
+    }
 
     console.log(`User signed in successfully: ${user.$id}`);
 
@@ -169,11 +188,19 @@ export async function signIn(data: SignInData): Promise<AuthResponse> {
 
 /**
  * Sign out the current user
+ * Note: This is for server-side session management
+ * In this app, we use JWT tokens stored in cookies, so this is optional
  */
 export async function signOut(): Promise<void> {
   try {
     const account = getAppwriteAccount();
-    await account.deleteSession('current');
+    // Try to delete any active Appwrite session
+    try {
+      await account.deleteSession({ sessionId: 'current' });
+    } catch (sessionError) {
+      // Session might not exist, which is fine
+      console.log('No active Appwrite session to delete');
+    }
     console.log('User signed out successfully');
   } catch (error) {
     console.error('Sign out error:', error);
@@ -197,7 +224,7 @@ export async function validateUser(
     const account = getAppwriteAccount();
 
     // Try to create session to validate credentials
-    await account.createEmailPasswordSession(email, password);
+    await account.createEmailPasswordSession({ email, password });
     const user = await account.get();
 
     return {

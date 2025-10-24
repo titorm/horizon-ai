@@ -1,14 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Standalone output for optimized production builds
   output: 'standalone',
 
-  // React 19 and Next.js 16 features
-  // React Compiler for automatic optimization (experimental)
-  reactCompiler: {
-    compilationMode: 'annotation',
-  },
+  // React Compiler for automatic optimization
+  // Eliminates need for manual useMemo/useCallback in most cases
+  reactCompiler: true,
 
-  // Partial Prerendering via cacheComponents
+  // Partial Prerendering (PPR) - combines static and dynamic rendering
   cacheComponents: true,
 
   experimental: {
@@ -16,16 +15,6 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '2mb',
       allowedOrigins: ['localhost:3000', ...(process.env.CORS_ORIGIN?.split(',') || [])],
-    },
-
-    // Turbopack configuration (stable in Next.js 16)
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
     },
   },
 

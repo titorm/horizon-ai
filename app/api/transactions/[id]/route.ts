@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * GET /api/transactions/[id]
  * Get a specific transaction by ID
  */
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Get authenticated user ID
     const userId = await getCurrentUserId();
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const transactionId = params.id;
+    const { id: transactionId } = await params;
 
     if (!transactionId) {
       return NextResponse.json({ message: 'Transaction ID is required' }, { status: 400 });
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
  * PATCH /api/transactions/[id]
  * Update a specific transaction
  */
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Get authenticated user ID
     const userId = await getCurrentUserId();
@@ -63,7 +63,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const transactionId = params.id;
+    const { id: transactionId } = await params;
 
     if (!transactionId) {
       return NextResponse.json({ message: 'Transaction ID is required' }, { status: 400 });
@@ -223,7 +223,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
  * DELETE /api/transactions/[id]
  * Delete a specific transaction
  */
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Get authenticated user ID
     const userId = await getCurrentUserId();
@@ -232,7 +232,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const transactionId = params.id;
+    const { id: transactionId } = await params;
 
     if (!transactionId) {
       return NextResponse.json({ message: 'Transaction ID is required' }, { status: 400 });

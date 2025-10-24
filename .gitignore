@@ -26,14 +26,12 @@ build
 .env.local.*
 *.local
 
-# Turbo
-.turbo
-
 # Backups
-apps/api/backups
+backups
+*.sql
 
-# Examples
-*.example.*
+# Examples (keep .env.example and .env.production.example)
+# *.example.*
 
 # Editor directories and files
 .idea

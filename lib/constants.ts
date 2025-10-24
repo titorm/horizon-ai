@@ -385,7 +385,7 @@ export const MOCK_INSIGHTS: FinancialInsight[] = [
     type: 'CASH_FLOW_FORECAST',
     title: 'Positive Cash Flow Forecast',
     description:
-      'Based on your income and typical spending, you're on track to have a surplus of ~R$ 3,200 this month. A great opportunity to save or invest!',
+      'Based on your income and typical spending, you\'re on track to have a surplus of ~R$ 3,200 this month. A great opportunity to save or invest!',
     actionText: 'Set a Goal',
   },
 ];

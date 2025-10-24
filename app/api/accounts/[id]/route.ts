@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * GET /api/accounts/[id]
  * Get a specific account by ID
  */
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Get authenticated user ID
     const userId = await getCurrentUserId();
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const accountId = params.id;
+    const { id: accountId } = await params;
 
     if (!accountId) {
       return NextResponse.json({ message: 'Account ID is required' }, { status: 400 });
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
  * PATCH /api/accounts/[id]
  * Update a specific account
  */
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Get authenticated user ID
     const userId = await getCurrentUserId();
@@ -66,7 +66,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const accountId = params.id;
+    const { id: accountId } = await params;
 
     if (!accountId) {
       return NextResponse.json({ message: 'Account ID is required' }, { status: 400 });
@@ -146,7 +146,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
  * DELETE /api/accounts/[id]
  * Delete a specific account
  */
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Get authenticated user ID
     const userId = await getCurrentUserId();
@@ -155,7 +155,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const accountId = params.id;
+    const { id: accountId } = await params;
 
     if (!accountId) {
       return NextResponse.json({ message: 'Account ID is required' }, { status: 400 });

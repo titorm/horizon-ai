@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * GET /api/credit-cards/account/[accountId]
  * Get all credit cards for a specific account
  */
-export async function GET(request: NextRequest, { params }: { params: { accountId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ accountId: string }> }) {
   try {
     // Get authenticated user ID
     const userId = await getCurrentUserId();
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: { accountI
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const accountId = params.accountId;
+    const { accountId } = await params;
 
     if (!accountId) {
       return NextResponse.json({ message: 'Account ID is required' }, { status: 400 });

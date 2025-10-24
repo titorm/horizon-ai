@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * GET /api/credit-cards/[id]
  * Get a specific credit card by ID
  */
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Get authenticated user ID
     const userId = await getCurrentUserId();
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const creditCardId = params.id;
+    const { id: creditCardId } = await params;
 
     if (!creditCardId) {
       return NextResponse.json({ message: 'Credit card ID is required' }, { status: 400 });
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
  * PATCH /api/credit-cards/[id]
  * Update a specific credit card
  */
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Get authenticated user ID
     const userId = await getCurrentUserId();
@@ -66,7 +66,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const creditCardId = params.id;
+    const { id: creditCardId } = await params;
 
     if (!creditCardId) {
       return NextResponse.json({ message: 'Credit card ID is required' }, { status: 400 });
@@ -165,7 +165,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
  * DELETE /api/credit-cards/[id]
  * Delete a specific credit card
  */
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Get authenticated user ID
     const userId = await getCurrentUserId();
@@ -174,7 +174,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const creditCardId = params.id;
+    const { id: creditCardId } = await params;
 
     if (!creditCardId) {
       return NextResponse.json({ message: 'Credit card ID is required' }, { status: 400 });

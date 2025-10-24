@@ -1,12 +1,23 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm install && pnpm --filter @horizon-ai/api build && pnpm --filter @horizon-ai/web build",
-  "outputDirectory": "apps/web/dist",
+  "buildCommand": "pnpm build",
   "installCommand": "pnpm install",
-  "rewrites": [
+  "framework": "nextjs",
+  "regions": [
+    "iad1"
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "headers": [
     {
-      "source": "/api/:path*",
-      "destination": "/api"
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, must-revalidate"
+        }
+      ]
     }
   ]
 }

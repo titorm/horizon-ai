@@ -1,161 +1,334 @@
-# ✅ Checklist de Deploy Serverless no Vercel
+# Deployment Checklist - Horizon AI
 
-Use este checklist antes de fazer o deploy para produção.
+## Pre-Deployment Checklist
 
-## 📋 Pré-Deploy
+### 1. Environment Variables Validation
 
-### 1. Código e Build
-- [ ] Código está na branch correta (`feat/vercel` ou `main`)
-- [ ] Todos os testes estão passando (`pnpm test`)
-- [ ] Build local funciona sem erros (`./test-serverless-build.sh`)
-- [ ] Não há erros de TypeScript (`pnpm typecheck`)
-- [ ] Código está formatado (`pnpm format`)
+#### Required Production Variables
 
-### 2. Variáveis de Ambiente
-- [ ] `APPWRITE_ENDPOINT` configurado no Vercel
-- [ ] `APPWRITE_PROJECT_ID` configurado no Vercel
-- [ ] `APPWRITE_API_KEY` configurado no Vercel
-- [ ] `APPWRITE_DATABASE_ID` configurado no Vercel
-- [ ] `JWT_SECRET` configurado no Vercel (use um valor forte!)
-- [ ] `JWT_EXPIRES_IN` configurado no Vercel
-- [ ] `CORS_ORIGIN` configurado com domínios corretos
-- [ ] Todas as variáveis estão definidas para o ambiente correto (Production/Preview)
+- [ ] `APPWRITE_ENDPOINT` - Appwrite API endpoint (e.g., https://cloud.appwrite.io/v1)
+- [ ] `APPWRITE_PROJECT_ID` - Your Appwrite project ID
+- [ ] `APPWRITE_API_KEY` - Appwrite API key with appropriate permissions
+- [ ] `APPWRITE_DATABASE_ID` - Database ID for your Appwrite database
+- [ ] `JWT_SECRET` - Strong secret for JWT signing (min 32 characters)
+- [ ] `JWT_EXPIRATION` - JWT token expiration (e.g., 7d)
+- [ ] `JWT_REFRESH_SECRET` - Strong secret for refresh tokens (min 32 characters)
+- [ ] `JWT_REFRESH_EXPIRATION` - Refresh token expiration (e.g., 30d)
+- [ ] `NODE_ENV` - Set to "production"
+- [ ] `API_URL` - Production API URL (e.g., https://yourdomain.com)
+- [ ] `CORS_ORIGIN` - Production domain (e.g., https://yourdomain.com)
 
-### 3. Segurança
-- [ ] Nenhuma credencial hardcoded no código
-- [ ] `.env` e `.env.local` estão no `.gitignore`
-- [ ] JWT_SECRET é único e forte (mínimo 32 caracteres)
-- [ ] CORS_ORIGIN está restrito aos domínios necessários
-- [ ] Rate limiting configurado (se aplicável)
+#### Optional Production Variables
 
-### 4. Configuração do Vercel
-- [ ] `vercel.json` está correto
-- [ ] Rotas `/api/*` estão configuradas
-- [ ] Build command está correto
-- [ ] Output directory está correto (`apps/web/dist`)
-- [ ] `.vercelignore` exclui arquivos desnecessários
+- [ ] `GEMINI_API_KEY` - Google Gemini API key (if using AI features)
+- [ ] `COOKIE_SECURE` - Set to "true" for HTTPS
+- [ ] `COOKIE_HTTP_ONLY` - Set to "true" (recommended)
+- [ ] `COOKIE_SAME_SITE` - Set to "strict" or "lax"
+- [ ] `COOKIE_MAX_AGE` - Cookie expiration in milliseconds
 
-## 🚀 Deploy
+#### Public Variables (NEXT*PUBLIC*\*)
 
-### Deploy de Preview (para testes)
+- [ ] `NEXT_PUBLIC_APPWRITE_ENDPOINT` - Same as APPWRITE_ENDPOINT
+- [ ] `NEXT_PUBLIC_APPWRITE_PROJECT_ID` - Same as APPWRITE_PROJECT_ID
+- [ ] `NEXT_PUBLIC_API_URL` - Production API URL
+
+### 2. Security Checklist
+
+- [ ] All JWT secrets are strong and unique (use `openssl rand -hex 32`)
+- [ ] No sensitive data in public environment variables
+- [ ] CORS_ORIGIN is set to production domain only
+- [ ] Cookies are configured with secure flags in production
+- [ ] API keys are not exposed in client-side code
+- [ ] .env files are in .gitignore
+- [ ] No hardcoded credentials in codebase
+
+### 3. Database Preparation
+
+- [ ] Appwrite project is created and configured
+- [ ] Database collections are created (run migrations)
+- [ ] Database indexes are optimized
+- [ ] Backup strategy is in place
+- [ ] Database connection is tested from production environment
+
+#### Run Migrations
+
 ```bash
-vercel
+# Check migration status
+pnpm migrate:status
+
+# Run pending migrations
+pnpm migrate:up
 ```
 
-### Deploy de Produção
+### 4. Code Quality & Testing
+
+- [ ] All TypeScript errors are resolved (`pnpm typecheck`)
+- [ ] ESLint passes without errors (`pnpm lint`)
+- [ ] Code is formatted (`pnpm format`)
+- [ ] Authentication flow is tested (`pnpm test:auth`)
+- [ ] Accounts CRUD is tested (`pnpm test:accounts`)
+- [ ] Transactions CRUD is tested (`pnpm test:transactions`)
+- [ ] Credit cards CRUD is tested (`pnpm test:credit-cards`)
+- [ ] All critical user flows are manually tested
+
+### 5. Build Validation
+
+- [ ] Production build completes successfully (`pnpm build`)
+- [ ] Build output is optimized (check .next/standalone)
+- [ ] No build warnings that need attention
+- [ ] Bundle size is acceptable
+- [ ] All pages render correctly in production mode
+
+#### Test Production Build Locally
+
 ```bash
-vercel --prod
+# Clean previous builds
+pnpm clean
+
+# Create production build
+pnpm build
+
+# Start production server
+pnpm start
+
+# Test at http://localhost:3000
 ```
 
-### Via GitHub (Automático)
+### 6. Performance Optimization
+
+- [ ] Images are optimized (using Next.js Image component)
+- [ ] Unused dependencies are removed
+- [ ] Code splitting is working correctly
+- [ ] Server Components are used where appropriate
+- [ ] API Routes have appropriate caching headers
+- [ ] Static assets are properly cached
+
+### 7. Monitoring & Logging
+
+- [ ] Error tracking is configured (e.g., Sentry)
+- [ ] Analytics are set up (if required)
+- [ ] Logging strategy is in place
+- [ ] Health check endpoint is working (`/api/health`)
+
+## Vercel Deployment Steps
+
+### 1. Initial Setup
+
+1. **Connect Repository**
+   - [ ] Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - [ ] Click "Add New Project"
+   - [ ] Import your Git repository
+   - [ ] Select the repository
+
+2. **Configure Project**
+   - [ ] Framework Preset: Next.js (auto-detected)
+   - [ ] Root Directory: `./` (project root)
+   - [ ] Build Command: `pnpm build` (default)
+   - [ ] Output Directory: `.next` (default)
+   - [ ] Install Command: `pnpm install` (default)
+
+3. **Environment Variables**
+   - [ ] Add all required environment variables from checklist above
+   - [ ] Use "Production" environment for production variables
+   - [ ] Use "Preview" environment for staging/preview deployments
+   - [ ] Use "Development" environment for local development overrides
+
+### 2. Deployment Configuration
+
+- [ ] Node.js version is set to 22.x or higher
+- [ ] Build & Development Settings are correct
+- [ ] Domain is configured (if custom domain)
+- [ ] SSL certificate is active
+
+### 3. Deploy
+
+- [ ] Click "Deploy" button
+- [ ] Wait for build to complete
+- [ ] Check deployment logs for errors
+- [ ] Verify deployment URL
+
+### 4. Post-Deployment Verification
+
+- [ ] Visit production URL
+- [ ] Test authentication (login/register)
+- [ ] Test protected routes
+- [ ] Test API endpoints
+- [ ] Test account creation
+- [ ] Test transaction creation
+- [ ] Test credit card management
+- [ ] Check browser console for errors
+- [ ] Test on mobile devices
+- [ ] Verify all pages load correctly
+
+## Post-Deployment Checklist
+
+### 1. Functional Testing
+
+- [ ] User registration works
+- [ ] User login works
+- [ ] User logout works
+- [ ] Protected routes are secured
+- [ ] Dashboard loads with correct data
+- [ ] Accounts page works (CRUD operations)
+- [ ] Transactions page works (CRUD operations)
+- [ ] Credit cards page works (CRUD operations)
+- [ ] All navigation links work
+- [ ] Forms submit correctly
+- [ ] Error messages display properly
+
+### 2. Performance Testing
+
+- [ ] Page load times are acceptable (< 3s)
+- [ ] Time to First Byte (TTFB) is good (< 600ms)
+- [ ] Largest Contentful Paint (LCP) is good (< 2.5s)
+- [ ] First Input Delay (FID) is good (< 100ms)
+- [ ] Cumulative Layout Shift (CLS) is good (< 0.1)
+
+### 3. Security Testing
+
+- [ ] HTTPS is enforced
+- [ ] Security headers are present
+- [ ] No sensitive data in client-side code
+- [ ] Authentication tokens are secure
+- [ ] CORS is properly configured
+- [ ] No XSS vulnerabilities
+- [ ] No SQL injection vulnerabilities
+
+### 4. Monitoring Setup
+
+- [ ] Error tracking is receiving events
+- [ ] Performance monitoring is active
+- [ ] Uptime monitoring is configured
+- [ ] Alerts are configured for critical issues
+
+## Rollback Plan
+
+If deployment fails or critical issues are found:
+
+1. **Immediate Rollback**
+   - [ ] Go to Vercel Dashboard
+   - [ ] Navigate to Deployments
+   - [ ] Find previous stable deployment
+   - [ ] Click "Promote to Production"
+
+2. **Investigation**
+   - [ ] Check deployment logs
+   - [ ] Check error tracking service
+   - [ ] Review recent code changes
+   - [ ] Test locally with production environment variables
+
+3. **Fix and Redeploy**
+   - [ ] Fix identified issues
+   - [ ] Test thoroughly locally
+   - [ ] Create new deployment
+   - [ ] Verify fix in production
+
+## Environment-Specific Configuration
+
+### Production
+
 ```bash
-git push origin feat/vercel  # ou main
+NODE_ENV=production
+APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+API_URL=https://yourdomain.com
+CORS_ORIGIN=https://yourdomain.com
+COOKIE_SECURE=true
 ```
 
-## ✨ Pós-Deploy
+### Staging/Preview
 
-### 1. Verificação Básica
-- [ ] Site está acessível no domínio
-- [ ] Página inicial carrega corretamente
-- [ ] Assets estáticos estão carregando (CSS, JS, imagens)
-- [ ] Não há erros 404 no console
-
-### 2. Verificação da API
-- [ ] Endpoint de health check responde: `GET /api/health`
-- [ ] Autenticação funciona: `POST /api/auth/login`
-- [ ] CORS permite requisições do frontend
-- [ ] Cookies estão sendo setados corretamente
-
-### 3. Testes Funcionais
-- [ ] Login/Logout funciona
-- [ ] Criação de conta funciona
-- [ ] Dashboard carrega dados reais
-- [ ] Transações são listadas corretamente
-- [ ] Integrações funcionam (se aplicável)
-
-### 4. Performance
-- [ ] Tempo de resposta da API < 2s
-- [ ] Cold start < 3s
-- [ ] Lighthouse score > 90 (se possível)
-- [ ] Sem memory leaks visíveis
-
-### 5. Monitoramento
-- [ ] Logs estão aparecendo no Vercel Dashboard
-- [ ] Sem erros críticos nos logs
-- [ ] Métricas de função estão normais
-- [ ] Alertas configurados (opcional)
-
-## 🔍 Troubleshooting
-
-### Se o deploy falhar:
-
-1. **Verifique os logs no Vercel Dashboard**
-   - Build logs
-   - Function logs
-   - Runtime logs
-
-2. **Erros comuns:**
-   - Falta de variáveis de ambiente
-   - Dependências em `devDependencies` que deveriam estar em `dependencies`
-   - Timeout em funções (limite de 10s no plano Hobby)
-   - Problemas com o Appwrite (conexão, credenciais)
-
-3. **Teste localmente primeiro:**
-   ```bash
-   vercel dev  # Simula ambiente do Vercel
-   ```
-
-4. **Verifique as configurações:**
-   - `vercel.json` está correto?
-   - `api/index.js` está apontando para o handler certo?
-   - Build está gerando `dist/serverless.js`?
-
-## 📊 Comandos Úteis
-
-### Ver logs em tempo real
 ```bash
-vercel logs [deployment-url] --follow
+NODE_ENV=production
+APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+API_URL=https://staging.yourdomain.com
+CORS_ORIGIN=https://staging.yourdomain.com
+COOKIE_SECURE=true
 ```
 
-### Listar deployments
+### Development
+
 ```bash
-vercel list
+NODE_ENV=development
+APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+API_URL=http://localhost:3000
+CORS_ORIGIN=http://localhost:3000
+COOKIE_SECURE=false
 ```
 
-### Remover um deployment
-```bash
-vercel remove [deployment-id]
-```
+## Common Issues & Solutions
 
-### Ver variáveis de ambiente
-```bash
-vercel env ls
-```
+### Build Failures
 
-### Adicionar variável de ambiente
-```bash
-vercel env add [VARIABLE_NAME]
-```
+**Issue**: TypeScript errors during build
 
-## 🎯 Métricas de Sucesso
+- **Solution**: Run `pnpm typecheck` locally and fix all errors
 
-Após o deploy, verifique:
-- ✅ Uptime > 99.9%
-- ✅ P95 response time < 2s
-- ✅ Error rate < 1%
-- ✅ Cold start < 3s
-- ✅ Zero critical bugs
+**Issue**: Missing dependencies
 
-## 📚 Documentos Relacionados
+- **Solution**: Ensure all dependencies are in `dependencies` (not `devDependencies`)
 
-- [VERCEL-SERVERLESS-GUIDE.md](./VERCEL-SERVERLESS-GUIDE.md) - Guia completo
-- [VERCEL-DEPLOY.md](../VERCEL-DEPLOY.md) - Instruções de deploy
-- [APPWRITE-SETUP.md](../APPWRITE-SETUP.md) - Configuração do Appwrite
+**Issue**: Environment variables not found
 
-## 🆘 Suporte
+- **Solution**: Verify all required variables are set in Vercel dashboard
 
-Se encontrar problemas:
-1. Consulte a [documentação do Vercel](https://vercel.com/docs)
-2. Verifique os logs no Dashboard
-3. Teste localmente com `vercel dev`
-4. Revise este checklist novamente
+### Runtime Errors
+
+**Issue**: 500 errors on API routes
+
+- **Solution**: Check Vercel function logs, verify environment variables
+
+**Issue**: Authentication not working
+
+- **Solution**: Verify JWT_SECRET is set, check cookie configuration
+
+**Issue**: Database connection fails
+
+- **Solution**: Verify Appwrite credentials, check network connectivity
+
+### Performance Issues
+
+**Issue**: Slow page loads
+
+- **Solution**: Enable caching, optimize images, use Server Components
+
+**Issue**: High memory usage
+
+- **Solution**: Check for memory leaks, optimize data fetching
+
+## Maintenance
+
+### Regular Tasks
+
+- [ ] Monitor error rates daily
+- [ ] Review performance metrics weekly
+- [ ] Update dependencies monthly
+- [ ] Review and rotate secrets quarterly
+- [ ] Backup database regularly
+- [ ] Test disaster recovery procedures
+
+### Updates
+
+- [ ] Test updates in staging first
+- [ ] Deploy during low-traffic periods
+- [ ] Monitor closely after deployment
+- [ ] Have rollback plan ready
+
+## Support Contacts
+
+- **Vercel Support**: https://vercel.com/support
+- **Appwrite Support**: https://appwrite.io/support
+- **Team Lead**: [Add contact]
+- **DevOps**: [Add contact]
+
+## Documentation Links
+
+- [Next.js Deployment](https://nextjs.org/docs/deployment)
+- [Vercel Documentation](https://vercel.com/docs)
+- [Appwrite Documentation](https://appwrite.io/docs)
+- [Project README](./README.md)
+- [Migration Guide](./docs/MIGRATION-GUIDE.md)
+
+---
+
+**Last Updated**: 2025-10-24
+**Version**: 1.0.0

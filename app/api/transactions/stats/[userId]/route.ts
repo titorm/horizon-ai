@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * GET /api/transactions/stats/[userId]
  * Get transaction statistics for a specific user
  */
-export async function GET(request: NextRequest, { params }: { params: { userId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   try {
     // Get authenticated user ID
     const authenticatedUserId = await getCurrentUserId();
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: { userId: 
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const targetUserId = params.userId;
+    const { userId: targetUserId } = await params;
 
     if (!targetUserId) {
       return NextResponse.json({ message: 'User ID is required' }, { status: 400 });

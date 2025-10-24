@@ -1,8 +1,4 @@
-packages:
-  - apps/**
-  - packages/**
-
 onlyBuiltDependencies:
-  - '@nestjs/core'
-  - bcrypt
   - esbuild
+  - sharp
+  - unrs-resolver
