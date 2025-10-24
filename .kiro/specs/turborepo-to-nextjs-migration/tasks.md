@@ -206,7 +206,7 @@
   - Atualizar endpoints para nova estrutura de API
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 10.2, 10.3, 10.4_
 
-- [ ] 19. Migrar utilitários
+- [x] 19. Migrar utilitários
   - Criar lib/utils/ e migrar random-name.generator.ts
   - Migrar outros utilitários necessários
   - _Requirements: 5.4_

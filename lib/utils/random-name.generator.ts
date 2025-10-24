@@ -5,7 +5,7 @@
  * Exemplo: alpha_bola_nove, delta_zebra_sete, etc
  *
  * Uso:
- * import { generateRandomName } from '@/utils/random-name.generator';
+ * import { generateRandomName } from '@/lib/utils/random-name.generator';
  * const name = generateRandomName(); // "alpha_bola_nove"
  */
 
