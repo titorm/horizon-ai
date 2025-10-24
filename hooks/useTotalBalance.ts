@@ -1,5 +1,7 @@
-import { useState, useEffect, useEffectEvent } from "react";
-import { apiFetch, apiEndpoints } from "../config/api";
+"use client";
+import { useState, useEffect, useCallback, use } from "react";
+import { apiFetch } from "@/lib/config/api";
+import { apiEndpoints } from "@/lib/config/api";
 
 interface Account {
     id: string;
@@ -7,14 +9,9 @@ interface Account {
 }
 
 export const useTotalBalance = () => {
-    const [totalBalance, setTotalBalance] = useState<number>(0);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const calculateTotalBalance = useEffectEvent(async () => {
-        setLoading(true);
-        setError(null);
-        
+    const calculateTotalBalance = useCallback(async () => {
         try {
             const response = await apiFetch(apiEndpoints.accounts.list);
             
@@ -25,24 +22,18 @@ export const useTotalBalance = () => {
             const accounts: Account[] = await response.json();
             
             // Sum all account balances
-            const total = accounts.reduce((sum, account) => sum + (account.balance || 0), 0);
-            
-            setTotalBalance(total);
+            return accounts.reduce((sum, account) => sum + (account.balance || 0), 0);
         } catch (err: any) {
             setError(err.message || "Failed to calculate total balance");
-            setTotalBalance(0);
-        } finally {
-            setLoading(false);
+            return 0;
         }
-    });
-
-    useEffect(() => {
-        calculateTotalBalance();
     }, []);
+
+    const totalBalance = use(calculateTotalBalance());
 
     return {
         totalBalance,
-        loading,
+        loading: false,
         error,
         refreshTotalBalance: calculateTotalBalance,
     };

@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { apiFetch, apiEndpoints } from '../config/api';
+"use client";
+import { useState, useEffect, useCallback, use, useOptimistic } from 'react';
+import { apiFetch } from '@/lib/config/api';
+import { apiEndpoints } from '@/lib/config/api';
 
 // API Response types
 interface ApiTransaction {
@@ -43,19 +45,12 @@ interface TransactionFilters {
 }
 
 export function useTransactions(userId: string | null) {
-  const [transactions, setTransactions] = useState<ApiTransaction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [total, setTotal] = useState(0);
 
   const fetchTransactions = useCallback(async (filters?: TransactionFilters) => {
     if (!userId) {
-      setIsLoading(false);
-      return;
+      return { data: [], total: 0 };
     }
-
-    setIsLoading(true);
-    setError(null);
 
     try {
       const params = new URLSearchParams();
@@ -78,34 +73,44 @@ export function useTransactions(userId: string | null) {
       const data: ApiTransactionResponse = await response.json();
       
       if (data.success) {
-        setTransactions(data.data);
-        setTotal(data.total);
+        return { data: data.data, total: data.total };
       } else {
         throw new Error('API returned unsuccessful response');
       }
     } catch (err) {
       console.error('Error fetching transactions:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
-      setTransactions([]);
-    } finally {
-      setIsLoading(false);
+      return { data: [], total: 0 };
     }
   }, [userId]);
 
-  useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+  const { data, total } = use(fetchTransactions());
+
+  const [optimisticTransactions, setOptimisticTransactions] = useOptimistic(
+    data,
+    (state, { action, transaction }) => {
+      switch (action) {
+        case 'add':
+          return [...state, transaction];
+        case 'delete':
+          return state.filter((t) => t.$id !== transaction.$id);
+        default:
+          return state;
+      }
+    }
+  );
 
   const refetch = useCallback((filters?: TransactionFilters) => {
     return fetchTransactions(filters);
   }, [fetchTransactions]);
 
   return {
-    transactions,
-    isLoading,
+    transactions: optimisticTransactions,
+    isLoading: false,
     error,
     total,
     refetch,
+    setOptimisticTransactions,
   };
 }
 

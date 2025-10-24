@@ -197,7 +197,7 @@
   - Atualizar referências de imagens
   - _Requirements: 9.4_
 
-- [ ] 18. Migrar custom hooks com React 19.2 features
+- [x] 18. Migrar custom hooks com React 19.2 features
   - Criar hooks/ e migrar useAccounts, useCreditCards, useTransactions, useFinancialInsights, useTotalBalance
   - Adaptar hooks para usar o novo hook 'use' do React 19.2 para data fetching
   - Implementar versões com useOptimistic para updates otimistas

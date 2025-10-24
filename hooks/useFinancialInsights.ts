@@ -1,5 +1,6 @@
+"use client";
 import { useMemo } from 'react';
-import type { FinancialInsight } from '../types';
+import type { FinancialInsight } from '@/lib/types';
 
 interface ApiTransaction {
   $id: string;

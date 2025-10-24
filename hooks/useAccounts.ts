@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, useEffectEvent } from 'react';
-import { apiFetch, API_URL } from '../config/api';
-import type { Account } from '../types';
+"use client";
+import { useState, useEffect, useCallback, use, useOptimistic } from 'react';
+import { apiFetch } from '@/lib/config/api';
+import type { Account } from '@/lib/types';
 
 export interface CreateAccountInput {
   name: string;
@@ -21,31 +22,49 @@ export interface UpdateAccountInput {
 }
 
 export function useAccounts() {
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAccounts = useEffectEvent(async () => {
+  const fetchAccounts = useCallback(async () => {
     try {
-      setLoading(true);
       setError(null);
       const response = await apiFetch('/accounts');
       if (!response.ok) {
         throw new Error('Failed to fetch accounts');
       }
-      const data = await response.json();
-      setAccounts(data);
+      return await response.json();
     } catch (err: any) {
       console.error('Error fetching accounts:', err);
       setError(err.message || 'Failed to fetch accounts');
-    } finally {
-      setLoading(false);
+      return [];
     }
-  });
+  }, []);
 
-  const createAccount = useEffectEvent(async (input: CreateAccountInput) => {
+  const accounts = use(fetchAccounts());
+
+  const [optimisticAccounts, setOptimisticAccounts] = useOptimistic(
+    accounts,
+    (state, { action, account }) => {
+      switch (action) {
+        case 'add':
+          return [...state, account];
+        case 'delete':
+          return state.filter((a) => a.$id !== account.$id);
+        default:
+          return state;
+      }
+    }
+  );
+
+  const createAccount = async (input: CreateAccountInput) => {
+    const newAccount = {
+      $id: `optimistic-${Date.now()}`,
+      ...input,
+      balance: input.initial_balance || 0,
+    } as Account;
+
+    setOptimisticAccounts({ action: 'add', account: newAccount });
+
     try {
-      setError(null);
       const response = await apiFetch('/accounts', {
         method: 'POST',
         body: JSON.stringify(input),
@@ -56,21 +75,37 @@ export function useAccounts() {
         throw new Error(errorData.message || 'Failed to create account');
       }
       
-      const data = await response.json();
-      
-      // If there's an initial balance, we should create a transaction for it
-      // This will be handled by the backend or we can add it here
-      
-      await fetchAccounts(); // Refresh the list
-      return data;
+      await fetchAccounts();
     } catch (err: any) {
       console.error('Error creating account:', err);
       setError(err.message || 'Failed to create account');
-      throw err;
     }
-  });
+  };
 
-  const updateAccount = useEffectEvent(async (accountId: string, input: UpdateAccountInput) => {
+  const deleteAccount = async (accountId: string) => {
+    const accountToDelete = accounts.find((a) => a.$id === accountId);
+    if (accountToDelete) {
+      setOptimisticAccounts({ action: 'delete', account: accountToDelete });
+    }
+
+    try {
+      const response = await apiFetch(`/accounts/${accountId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete account');
+      }
+      
+      await fetchAccounts();
+    } catch (err: any) {
+      console.error('Error deleting account:', err);
+      setError(err.message || 'Failed to delete account');
+    }
+  };
+
+  const updateAccount = useCallback(async (accountId: string, input: UpdateAccountInput) => {
     try {
       setError(null);
       const response = await apiFetch(`/accounts/${accountId}`, {
@@ -91,29 +126,9 @@ export function useAccounts() {
       setError(err.message || 'Failed to update account');
       throw err;
     }
-  });
+  }, [fetchAccounts]);
 
-  const deleteAccount = useEffectEvent(async (accountId: string) => {
-    try {
-      setError(null);
-      const response = await apiFetch(`/accounts/${accountId}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to delete account');
-      }
-      
-      await fetchAccounts(); // Refresh the list
-    } catch (err: any) {
-      console.error('Error deleting account:', err);
-      setError(err.message || 'Failed to delete account');
-      throw err;
-    }
-  });
-
-  const getAccountBalance = useEffectEvent(async (accountId: string): Promise<number> => {
+  const getAccountBalance = useCallback(async (accountId: string): Promise<number> => {
     try {
       const response = await apiFetch(`/accounts/${accountId}/balance`);
       if (!response.ok) {
@@ -125,20 +140,15 @@ export function useAccounts() {
       console.error('Error getting account balance:', err);
       throw err;
     }
-  });
-
-  useEffect(() => {
-    fetchAccounts();
   }, []);
 
   return {
-    accounts,
-    loading,
+    accounts: optimisticAccounts,
+    loading: false,
     error,
-    fetchAccounts,
     createAccount,
-    updateAccount,
     deleteAccount,
+    updateAccount,
     getAccountBalance,
   };
 }
